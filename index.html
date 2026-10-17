@@ -10,68 +10,73 @@
       box-sizing: border-box;
       -webkit-tap-highlight-color: transparent;
     }
-    body {
+    html, body {
+      height: 100%;
+      width: 100%;
+      margin: 0;
+      padding: 0;
       background-color: #0b0f19;
       color: #ffffff;
       font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
       text-rendering: optimizeLegibility;
       -webkit-font-smoothing: antialiased;
+      overflow: hidden;
     }
     
-    /* Scrollbars diskret og tilpasset */
+    /* Scrollbar */
     ::-webkit-scrollbar {
-      width: 5px;
-      height: 5px;
+      width: 4px;
+      height: 4px;
     }
     ::-webkit-scrollbar-track {
       background: transparent;
     }
     ::-webkit-scrollbar-thumb {
-      background: #334155;
-      border-radius: 3px;
+      background: #374151;
+      border-radius: 4px;
     }
 
-    /* Garantert skarp lesbarhet med faste kontrastfarger */
-    .dashboard-card {
+    /* Modul- og brikkestiler med knivskarp kontrast */
+    .dash-card {
       background-color: #111827;
       border: 1.5px solid #374151;
-      border-radius: 14px;
+      border-radius: 12px;
     }
-    .inner-tile {
+    .dash-tile {
       background-color: #1f2937;
       border: 1px solid #374151;
-      border-radius: 10px;
+      border-radius: 8px;
     }
   </style>
 </head>
-<body class="h-screen w-screen overflow-hidden p-3 sm:p-4 flex flex-col justify-between select-none text-slate-100">
+<body class="p-2 sm:p-3 flex flex-col justify-between h-screen w-screen select-none text-slate-100">
 
-  <!-- ================= TOPPBAR ================= -->
-  <header class="dashboard-card p-3.5 sm:p-4 flex flex-col md:flex-row md:items-center justify-between gap-3 shadow-md shrink-0">
-    <!-- Venstre: Klokke, Dato og Lokasjon -->
-    <div class="flex items-center gap-4 sm:gap-6 shrink-0">
+  <!-- ================= TOPPBAR (Kompakt og fleksibel) ================= -->
+  <header class="dash-card px-3 py-2 sm:px-4 sm:py-2.5 flex items-center justify-between gap-2 shrink-0">
+    <!-- Klokke og Dato -->
+    <div class="flex items-center gap-3 shrink-0">
       <div>
-        <div id="clock" class="text-4xl sm:text-5xl font-black font-mono tracking-tight text-white leading-none">00:00</div>
-        <div id="date" class="text-slate-300 text-xs sm:text-sm font-semibold capitalize mt-1">Laster dato...</div>
+        <div id="clock" class="text-3xl sm:text-4xl lg:text-5xl font-black font-mono tracking-tight text-white leading-none">00:00</div>
+        <div id="date" class="text-slate-300 text-[11px] sm:text-xs font-semibold capitalize mt-0.5">Laster dato...</div>
       </div>
-      <div class="h-10 w-px bg-slate-700 hidden sm:block"></div>
-      <div class="hidden sm:block">
-        <div class="text-[11px] font-bold tracking-wider uppercase text-slate-400">Holdeplass / Sted</div>
-        <div class="text-sm font-bold text-white">Alexander Kiellands plass</div>
+      <div class="h-8 w-px bg-slate-700 hidden sm:block"></div>
+      <div class="hidden md:block">
+        <div class="text-[9px] font-bold tracking-wider uppercase text-slate-400">Holdeplass</div>
+        <div class="text-xs font-bold text-white whitespace-nowrap">Alexander Kiellands plass</div>
       </div>
     </div>
 
-    <!-- Høyre: Sanntidsvær + Værvarsel for timene utover dagen -->
-    <div class="flex items-center gap-3 sm:gap-4 overflow-x-auto min-w-0">
+    <!-- Vær: Nå + Time for time (Horisontal og tilpasset) -->
+    <div class="flex items-center gap-2 overflow-hidden min-w-0">
       <!-- Været NÅ -->
-      <div class="inner-tile px-3.5 py-2 flex items-center gap-3 shrink-0">
-        <div class="text-3xl" id="weather-icon">⛅</div>
+      <div class="dash-tile px-2.5 py-1.5 flex items-center gap-2 shrink-0">
+        <div class="text-2xl" id="weather-icon">⛅</div>
         <div>
-          <div class="flex items-baseline gap-1.5">
-            <span id="weather-temp" class="text-2xl sm:text-3xl font-black text-white">--°</span>
-            <span id="weather-desc" class="text-slate-200 text-xs font-semibold">Henter...</span>
+          <div class="flex items-baseline gap-1">
+            <span id="weather-temp" class="text-xl sm:text-2xl font-black text-white leading-none">--°</span>
+            <span id="weather-desc" class="text-slate-300 text-[11px] font-medium hidden sm:inline">Henter...</span>
           </div>
-          <div class="text-[11px] font-medium text-slate-300 flex items-center gap-2 mt-0.5">
+          <div class="text-[10px] text-slate-300 flex items-center gap-1.5 leading-none mt-1">
             <span>Regn: <strong id="weather-rain" class="text-white">-- mm</strong></span>
             <span>•</span>
             <span>Vind: <strong id="weather-wind" class="text-white">-- m/s</strong></span>
@@ -79,97 +84,91 @@
         </div>
       </div>
 
-      <!-- Time for time resten av dagen -->
-      <div class="flex flex-col min-w-0">
-        <div class="text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1 flex items-center justify-between px-1">
-          <span>De neste timene</span>
-          <span class="text-slate-400 font-normal">Temp / Vind / Regn</span>
-        </div>
-        <div id="hourly-forecast" class="flex items-center gap-1.5 overflow-x-auto pb-0.5">
-          <div class="text-xs text-slate-400 py-2">Henter værvarsel for timene...</div>
-        </div>
+      <!-- Time for time (Sveipbar på smale skjermer, synlig og ryddig) -->
+      <div id="hourly-forecast" class="flex items-center gap-1.5 overflow-x-auto min-w-0 py-0.5">
+        <div class="text-[11px] text-slate-400 px-2 whitespace-nowrap">Henter timer...</div>
       </div>
     </div>
   </header>
 
-  <!-- ================= HOVEDINNHOLD (3 Kolonner optimalisert for 10" tablet) ================= -->
-  <main class="grid grid-cols-12 gap-3 sm:gap-4 my-2.5 sm:my-3 flex-1 min-h-0">
+  <!-- ================= HOVEDINNHOLD (3 Kolonner) ================= -->
+  <main class="grid grid-cols-12 gap-2 sm:gap-3 my-2 flex-1 min-h-0">
 
     <!-- KOLONNE 1: Bussavganger (Entur Sanntid) -->
-    <section class="col-span-12 md:col-span-4 flex flex-col gap-3 min-h-0">
+    <section class="col-span-12 lg:col-span-4 md:col-span-4 flex flex-col gap-2 min-h-0">
       
       <!-- 54 mot Kjelsås -->
-      <div class="dashboard-card p-3 sm:p-3.5 flex-1 flex flex-col justify-between">
-        <div class="flex justify-between items-center border-b border-slate-700/80 pb-2">
-          <div class="flex items-center gap-2.5">
-            <span class="bg-red-600 text-white font-black px-2 py-0.5 rounded text-base sm:text-lg">54</span>
+      <div class="dash-card p-2.5 sm:p-3 flex-1 flex flex-col justify-between min-h-0">
+        <div class="flex justify-between items-center border-b border-slate-700/80 pb-1.5 shrink-0">
+          <div class="flex items-center gap-2">
+            <span class="bg-red-600 text-white font-black px-1.5 py-0.5 rounded text-sm sm:text-base leading-none">54</span>
             <div>
-              <h2 class="text-sm sm:text-base font-bold text-white leading-tight">Mot Kjelsås</h2>
-              <p class="text-[10px] text-slate-400">Alexander Kiellands plass</p>
+              <h2 class="text-xs sm:text-sm font-bold text-white leading-tight">Mot Kjelsås</h2>
+              <p class="text-[9px] text-slate-400">Kiellands plass</p>
             </div>
           </div>
-          <span class="text-[10px] font-bold bg-blue-500/20 text-blue-300 border border-blue-500/50 px-2 py-0.5 rounded-full">Marius</span>
+          <span class="text-[9px] font-bold bg-blue-500/20 text-blue-300 border border-blue-500/50 px-2 py-0.5 rounded-full">Marius</span>
         </div>
-        <div id="bus-54-list" class="flex flex-col gap-2 my-auto pt-2">
-          <div class="text-slate-400 text-xs">Henter sanntidsavganger fra Entur...</div>
+        <div id="bus-54-list" class="flex flex-col gap-1.5 my-auto pt-1.5">
+          <div class="text-slate-400 text-xs">Henter sanntidsavganger...</div>
         </div>
       </div>
 
       <!-- 21 mot Tjuvholmen -->
-      <div class="dashboard-card p-3 sm:p-3.5 flex-1 flex flex-col justify-between">
-        <div class="flex justify-between items-center border-b border-slate-700/80 pb-2">
-          <div class="flex items-center gap-2.5">
-            <span class="bg-red-600 text-white font-black px-2 py-0.5 rounded text-base sm:text-lg">21</span>
+      <div class="dash-card p-2.5 sm:p-3 flex-1 flex flex-col justify-between min-h-0">
+        <div class="flex justify-between items-center border-b border-slate-700/80 pb-1.5 shrink-0">
+          <div class="flex items-center gap-2">
+            <span class="bg-red-600 text-white font-black px-1.5 py-0.5 rounded text-sm sm:text-base leading-none">21</span>
             <div>
-              <h2 class="text-sm sm:text-base font-bold text-white leading-tight">Mot Tjuvholmen</h2>
-              <p class="text-[10px] text-slate-400">Alexander Kiellands plass</p>
+              <h2 class="text-xs sm:text-sm font-bold text-white leading-tight">Mot Tjuvholmen</h2>
+              <p class="text-[9px] text-slate-400">Kiellands plass</p>
             </div>
           </div>
-          <span class="text-[10px] font-bold bg-pink-500/20 text-pink-300 border border-pink-500/50 px-2 py-0.5 rounded-full">Sara</span>
+          <span class="text-[9px] font-bold bg-pink-500/20 text-pink-300 border border-pink-500/50 px-2 py-0.5 rounded-full">Sara</span>
         </div>
-        <div id="bus-21-list" class="flex flex-col gap-2 my-auto pt-2">
-          <div class="text-slate-400 text-xs">Henter sanntidsavganger fra Entur...</div>
+        <div id="bus-21-list" class="flex flex-col gap-1.5 my-auto pt-1.5">
+          <div class="text-slate-400 text-xs">Henter sanntidsavganger...</div>
         </div>
       </div>
 
     </section>
 
     <!-- KOLONNE 2: Google Kalender (Neste 7 dager) -->
-    <section class="col-span-12 md:col-span-4 dashboard-card p-3 sm:p-3.5 flex flex-col min-h-0">
-      <div class="flex justify-between items-center border-b border-slate-700/80 pb-2 mb-2 shrink-0">
+    <section class="col-span-12 lg:col-span-4 md:col-span-4 dash-card p-2.5 sm:p-3 flex flex-col min-h-0">
+      <div class="flex justify-between items-center border-b border-slate-700/80 pb-1.5 mb-1.5 shrink-0">
         <div>
-          <h2 class="text-sm sm:text-base font-bold text-white">Kalender</h2>
-          <p class="text-[10px] text-slate-400 font-medium">Neste 7 dager</p>
+          <h2 class="text-xs sm:text-sm font-bold text-white leading-tight">Kalender</h2>
+          <p class="text-[9px] text-slate-400 font-medium">Neste 7 dager</p>
         </div>
-        <div class="flex gap-2.5 text-[11px] font-medium">
-          <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-blue-500"></span>Marius</span>
-          <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-pink-500"></span>Sara</span>
-          <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span>Felles</span>
+        <div class="flex gap-2 text-[10px] font-medium">
+          <span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-blue-500"></span>Marius</span>
+          <span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-pink-500"></span>Sara</span>
+          <span class="flex items-center gap-1"><span class="w-2 h-2 rounded-full bg-emerald-500"></span>Felles</span>
         </div>
       </div>
 
-      <div id="calendar-list" class="flex flex-col gap-2.5 overflow-y-auto pr-1 flex-1">
+      <div id="calendar-list" class="flex flex-col gap-2 overflow-y-auto pr-1 flex-1">
         <div class="text-slate-400 text-xs">Henter avtaler...</div>
       </div>
     </section>
 
     <!-- KOLONNE 3: Nyheter (NRK, E24, VG) -->
-    <section class="col-span-12 md:col-span-4 dashboard-card p-3 sm:p-3.5 flex flex-col min-h-0">
-      <div class="flex justify-between items-center border-b border-slate-700/80 pb-2 mb-2 shrink-0">
+    <section class="col-span-12 lg:col-span-4 md:col-span-4 dash-card p-2.5 sm:p-3 flex flex-col min-h-0">
+      <div class="flex justify-between items-center border-b border-slate-700/80 pb-1.5 mb-1.5 shrink-0">
         <div>
-          <h2 class="text-sm sm:text-base font-bold text-white">Nyheter</h2>
-          <p class="text-[10px] text-slate-400 font-medium">Siste nytt</p>
+          <h2 class="text-xs sm:text-sm font-bold text-white leading-tight">Nyheter</h2>
+          <p class="text-[9px] text-slate-400 font-medium">Siste nytt</p>
         </div>
         <!-- Kildeknapper -->
-        <div class="flex bg-slate-900 p-0.5 rounded-lg border border-slate-700 text-[10px]">
-          <button onclick="setNewsSource('ALL')" id="news-tab-ALL" class="news-tab px-2 py-0.5 rounded font-bold bg-slate-700 text-white">Alt</button>
-          <button onclick="setNewsSource('NRK')" id="news-tab-NRK" class="news-tab px-2 py-0.5 rounded font-bold text-slate-300 hover:text-white">NRK</button>
-          <button onclick="setNewsSource('E24')" id="news-tab-E24" class="news-tab px-2 py-0.5 rounded font-bold text-slate-300 hover:text-white">E24</button>
-          <button onclick="setNewsSource('VG')" id="news-tab-VG" class="news-tab px-2 py-0.5 rounded font-bold text-slate-300 hover:text-white">VG</button>
+        <div class="flex bg-slate-900 p-0.5 rounded border border-slate-700 text-[10px]">
+          <button onclick="setNewsSource('ALL')" id="news-tab-ALL" class="news-tab px-1.5 py-0.5 rounded font-bold bg-slate-700 text-white">Alt</button>
+          <button onclick="setNewsSource('NRK')" id="news-tab-NRK" class="news-tab px-1.5 py-0.5 rounded font-bold text-slate-300 hover:text-white">NRK</button>
+          <button onclick="setNewsSource('E24')" id="news-tab-E24" class="news-tab px-1.5 py-0.5 rounded font-bold text-slate-300 hover:text-white">E24</button>
+          <button onclick="setNewsSource('VG')" id="news-tab-VG" class="news-tab px-1.5 py-0.5 rounded font-bold text-slate-300 hover:text-white">VG</button>
         </div>
       </div>
 
-      <div id="news-list" class="flex flex-col gap-2 overflow-y-auto pr-1 flex-1">
+      <div id="news-list" class="flex flex-col gap-1.5 overflow-y-auto pr-1 flex-1">
         <div class="text-slate-400 text-xs">Henter siste nyheter...</div>
       </div>
     </section>
@@ -177,14 +176,14 @@
   </main>
 
   <!-- ================= BUNNLINJE ================= -->
-  <footer class="flex justify-between items-center text-[10px] sm:text-xs text-slate-400 px-1 py-0.5 shrink-0">
-    <div class="flex items-center gap-2">
-      <span id="status-dot" class="w-2.5 h-2.5 rounded-full bg-emerald-500"></span>
+  <footer class="flex justify-between items-center text-[10px] text-slate-400 px-1 py-0.5 shrink-0">
+    <div class="flex items-center gap-1.5">
+      <span id="status-dot" class="w-2 h-2 rounded-full bg-emerald-500"></span>
       <span id="status-text" class="font-medium text-slate-300">Sanntid aktiv (Entur StopPlace 6288)</span>
     </div>
-    <div class="flex items-center gap-3 font-mono">
+    <div class="flex items-center gap-2 font-mono">
       <span id="last-updated" class="text-slate-400">Sist: --:--</span>
-      <span id="refresh-countdown" class="bg-slate-800 border border-slate-700 text-slate-200 px-2 py-0.5 rounded font-bold">
+      <span id="refresh-countdown" class="bg-slate-800 border border-slate-700 text-slate-200 px-1.5 py-0.2 rounded font-bold">
         30s
       </span>
     </div>
@@ -192,9 +191,7 @@
 
   <!-- ================= JAVASCRIPT ================= -->
   <script>
-    // ==========================================
     // 1. KLOKKE OG DATO
-    // ==========================================
     function updateClock() {
       const now = new Date();
       document.getElementById('clock').textContent = now.toLocaleTimeString('no-NO', { hour: '2-digit', minute: '2-digit' });
@@ -203,9 +200,7 @@
     setInterval(updateClock, 1000);
     updateClock();
 
-    // ==========================================
     // 2. ENTUR SANNTID & 30-SEKUNDERS MOTOR
-    // ==========================================
     const REFRESH_INTERVAL = 30;
     let secondsUntilNextFetch = REFRESH_INTERVAL;
     let cachedDepartures = { next54: [], next21: [] };
@@ -251,11 +246,11 @@
         renderBusList('bus-21-list', cachedDepartures.next21);
 
         document.getElementById('last-updated').textContent = 'Sist: ' + new Date().toLocaleTimeString('no-NO', { hour: '2-digit', minute: '2-digit' });
-        document.getElementById('status-dot').className = 'w-2.5 h-2.5 rounded-full bg-emerald-500';
+        document.getElementById('status-dot').className = 'w-2 h-2 rounded-full bg-emerald-500';
         document.getElementById('status-text').textContent = 'Sanntid aktiv (Entur StopPlace 6288)';
       } catch (err) {
         console.error('Feil ved henting fra Entur:', err);
-        document.getElementById('status-dot').className = 'w-2.5 h-2.5 rounded-full bg-red-500';
+        document.getElementById('status-dot').className = 'w-2 h-2 rounded-full bg-red-500';
         document.getElementById('status-text').textContent = 'Entur midlertidig utilgjengelig';
       }
     }
@@ -279,22 +274,20 @@
         const exactClock = depTime.toLocaleTimeString('no-NO', { hour: '2-digit', minute: '2-digit' });
         const urgencyClass = diffMin <= 4 ? 'text-amber-400 font-extrabold' : 'text-emerald-400 font-bold';
 
+        // Splitter i to klare kolonner inne i brikken slik at tekst aldri krasjer med tall på smale nettbrett
         return `
-          <div class="inner-tile px-2.5 py-2 flex items-center justify-between gap-1.5 min-w-0">
-            <!-- Venstre del: Destinasjon + Sanntid-tagg (Aldri linjeskift) -->
-            <div class="flex items-center gap-1.5 min-w-0 flex-1 overflow-hidden">
-              <span class="font-bold text-xs sm:text-sm text-white truncate whitespace-nowrap block" title="${dep.destinationDisplay.frontText}">
+          <div class="dash-tile px-2 py-1.5 flex items-center justify-between gap-1 overflow-hidden">
+            <div class="flex items-center gap-1.5 min-w-0 flex-1">
+              <span class="font-bold text-xs sm:text-sm text-white truncate block" title="${dep.destinationDisplay.frontText}">
                 ${dep.destinationDisplay.frontText}
               </span>
               ${dep.realtime 
-                ? '<span class="text-[9px] bg-emerald-500/20 text-emerald-300 font-bold px-1 py-0.5 rounded border border-emerald-500/40 uppercase whitespace-nowrap shrink-0">Sanntid</span>' 
-                : '<span class="text-[9px] bg-slate-700 text-slate-200 font-medium px-1 py-0.5 rounded uppercase whitespace-nowrap shrink-0">Rute</span>'}
+                ? '<span class="text-[8px] bg-emerald-500/20 text-emerald-300 font-bold px-1 py-0.2 rounded border border-emerald-500/40 uppercase whitespace-nowrap shrink-0">Sanntid</span>' 
+                : '<span class="text-[8px] bg-slate-700 text-slate-300 font-medium px-1 py-0.2 rounded uppercase whitespace-nowrap shrink-0">Rute</span>'}
             </div>
-
-            <!-- Høyre del: Klokkeslett + Nedtelling (Fast bredde, aldri linjeskift) -->
-            <div class="flex items-baseline justify-end gap-1.5 shrink-0 whitespace-nowrap">
-              <span class="text-slate-400 text-[11px] sm:text-xs font-mono">(${exactClock})</span>
-              <span class="text-base sm:text-lg font-mono ${urgencyClass} text-right min-w-[50px] inline-block font-black">${timeText}</span>
+            <div class="flex items-baseline justify-end gap-1 shrink-0 whitespace-nowrap pl-1">
+              <span class="text-slate-400 text-[10px] font-mono">(${exactClock})</span>
+              <span class="text-sm sm:text-base font-mono ${urgencyClass} text-right min-w-[46px] font-black">${timeText}</span>
             </div>
           </div>
         `;
@@ -319,9 +312,7 @@
       }, 1000);
     }
 
-    // ==========================================
-    // 3. VÆRMELDING MED TIME-FOR-TIME UT DAGEN
-    // ==========================================
+    // 3. VÆRMELDING MED TIME-FOR-TIME
     function getWeatherSymbol(code) {
       if (code === 0) return { text: 'Klarvær', icon: '☀️' };
       if (code === 1) return { text: 'Lettskyet', icon: '🌤️' };
@@ -342,7 +333,7 @@
         if (!res.ok) throw new Error(`Vær HTTP-feil: ${res.status}`);
         const data = await res.json();
         
-        // 1. Sanntidsvær nå
+        // Været nå
         const cur = data.current;
         const curMeta = getWeatherSymbol(cur.weather_code);
         document.getElementById('weather-temp').textContent = `${Math.round(cur.temperature_2m)}°`;
@@ -351,7 +342,7 @@
         document.getElementById('weather-rain').textContent = `${cur.precipitation} mm`;
         document.getElementById('weather-wind').textContent = `${Math.round(cur.wind_speed_10m)} m/s`;
 
-        // 2. Værvarsel for timene utover
+        // Værvarsel time for time
         const hourly = data.hourly;
         const now = new Date();
         const hourlyContainer = document.getElementById('hourly-forecast');
@@ -361,6 +352,7 @@
         for (let i = 0; i < hourly.time.length; i++) {
           const t = new Date(hourly.time[i]);
           
+          // Vis inntil 5-6 timer frem
           if (t >= now && count < 6) {
             count++;
             const hourLabel = `${String(t.getHours()).padStart(2, '0')}:00`;
@@ -370,27 +362,25 @@
             const sym = getWeatherSymbol(hourly.weather_code[i]);
 
             hourlyHtml += `
-              <div class="inner-tile px-2 py-1.5 flex flex-col items-center justify-between text-center min-w-[58px] shrink-0">
-                <span class="text-[10px] font-mono text-slate-300 font-semibold">${hourLabel}</span>
-                <span class="text-base my-0.5" title="${sym.text}">${sym.icon}</span>
-                <span class="text-xs font-black text-white font-mono">${temp}°</span>
-                <span class="text-[10px] text-slate-300 font-mono">${wind} m/s</span>
-                <span class="text-[9px] font-bold font-mono ${rain > 0 ? 'text-cyan-400' : 'text-slate-500'}">${rain > 0 ? rain + 'mm' : '0mm'}</span>
+              <div class="dash-tile px-1.5 py-1 flex flex-col items-center justify-between text-center min-w-[50px] shrink-0">
+                <span class="text-[9px] font-mono text-slate-300 font-semibold">${hourLabel}</span>
+                <span class="text-sm my-0.2" title="${sym.text}">${sym.icon}</span>
+                <span class="text-[11px] font-black text-white font-mono leading-tight">${temp}°</span>
+                <span class="text-[8px] text-slate-300 font-mono">${wind}m/s</span>
+                <span class="text-[8px] font-bold font-mono ${rain > 0 ? 'text-cyan-400' : 'text-slate-500'}">${rain > 0 ? rain + 'mm' : '0mm'}</span>
               </div>
             `;
           }
         }
 
-        hourlyContainer.innerHTML = hourlyHtml || '<span class="text-xs text-slate-400">Ingen flere timer i dag</span>';
+        hourlyContainer.innerHTML = hourlyHtml || '<span class="text-xs text-slate-400">Ingen flere timer</span>';
 
       } catch (err) {
         console.error('Feil ved henting av vær:', err);
       }
     }
 
-    // ==========================================
     // 4. GOOGLE KALENDER – NESTE 7 DAGER
-    // ==========================================
     const CALENDAR_API_URL = "https://script.google.com/macros/s/AKfycbw81NLZFBBq2e09NJyxsRHNsyIUfjjo5xD_pn6tkNR-lSJAHV6SUA05_-iF6ztDqe5RlQ/exec";
 
     const colorMap = {
@@ -461,22 +451,22 @@
             }
 
             return `
-              <div class="inner-tile border-l-4 ${borderClass} px-3 py-2 flex items-center justify-between">
-                <div class="overflow-hidden pr-2">
-                  <div class="font-bold text-xs sm:text-sm text-white truncate">${ev.title}</div>
-                  <div class="text-[11px] font-semibold text-slate-300 mt-0.5">${ev.owner || ''}</div>
+              <div class="dash-tile border-l-4 ${borderClass} px-2 py-1.5 flex items-center justify-between">
+                <div class="overflow-hidden pr-1 min-w-0">
+                  <div class="font-bold text-xs text-white truncate">${ev.title}</div>
+                  <div class="text-[10px] font-semibold text-slate-300 mt-0.5">${ev.owner || ''}</div>
                 </div>
-                <div class="text-[11px] font-mono bg-slate-800 border border-slate-700 px-2 py-0.5 rounded text-slate-100 whitespace-nowrap">${timeStr}</div>
+                <div class="text-[10px] font-mono bg-slate-800 border border-slate-700 px-1.5 py-0.5 rounded text-slate-100 whitespace-nowrap shrink-0">${timeStr}</div>
               </div>
             `;
           }).join('');
 
           return `
             <div class="space-y-1">
-              <div class="text-[10px] font-bold uppercase tracking-wider text-slate-400 sticky top-0 bg-slate-900/95 py-0.5 capitalize border-b border-slate-700/60">
+              <div class="text-[9px] font-bold uppercase tracking-wider text-slate-400 sticky top-0 bg-slate-900/95 py-0.5 capitalize border-b border-slate-700/60">
                 ${group.header}
               </div>
-              <div class="space-y-1.5">
+              <div class="space-y-1">
                 ${eventsHtml}
               </div>
             </div>
@@ -486,16 +476,14 @@
       } catch (err) {
         console.error('Feil ved henting av kalender:', err);
         container.innerHTML = `
-          <div class="bg-red-950/60 border border-red-500/60 rounded-lg p-3 text-xs text-red-200">
-            Kunne ikke laste kalenderdata. Sjekk Google Apps Script-distribusjonen.
+          <div class="bg-red-950/60 border border-red-500/60 rounded p-2 text-xs text-red-200">
+            Kunne ikke laste kalenderdata. Sjekk Apps Script.
           </div>
         `;
       }
     }
 
-    // ==========================================
     // 5. NYHETSFEED (NRK, E24, VG)
-    // ==========================================
     let allNews = [];
     let activeNewsSource = 'ALL';
 
@@ -595,13 +583,13 @@
       }
 
       container.innerHTML = filtered.map(item => `
-        <a href="${item.link}" target="_blank" rel="noopener noreferrer" class="inner-tile p-2.5 flex items-start justify-between gap-2.5 hover:border-slate-500 transition-colors">
-          <div class="space-y-1 flex-1 min-w-0">
+        <a href="${item.link}" target="_blank" rel="noopener noreferrer" class="dash-tile p-2 flex items-start justify-between gap-2 hover:border-slate-500 transition-colors">
+          <div class="space-y-0.5 flex-1 min-w-0">
             <div class="flex items-center gap-1.5">
-              <span class="text-[9px] font-black px-1.5 py-0.5 rounded ${item.badgeClass}">${item.source}</span>
-              <span class="text-[10px] text-slate-300 font-mono font-medium">${item.timeAgo}</span>
+              <span class="text-[8px] font-black px-1.5 py-0.2 rounded ${item.badgeClass}">${item.source}</span>
+              <span class="text-[9px] text-slate-300 font-mono font-medium">${item.timeAgo}</span>
             </div>
-            <div class="text-xs sm:text-sm font-semibold text-white leading-snug line-clamp-2">
+            <div class="text-xs font-semibold text-white leading-snug line-clamp-2">
               ${item.title}
             </div>
           </div>
@@ -621,3 +609,5 @@
   </script>
 </body>
 </html>
+index.html
+Viser index.html.
