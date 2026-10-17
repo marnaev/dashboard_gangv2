@@ -139,7 +139,7 @@
       <div class="flex justify-between items-center border-b border-slate-700/80 pb-2 mb-2 shrink-0">
         <div>
           <h2 class="text-sm sm:text-base font-bold text-white">Kalender</h2>
-          <p class="text-[10px] text-slate-400 font-medium"></p>
+          <p class="text-[10px] text-slate-400 font-medium">Neste 7 dager</p>
         </div>
         <div class="flex gap-2.5 text-[11px] font-medium">
           <span class="flex items-center gap-1.5"><span class="w-2.5 h-2.5 rounded-full bg-blue-500"></span>Marius</span>
@@ -280,16 +280,21 @@
         const urgencyClass = diffMin <= 4 ? 'text-amber-400 font-extrabold' : 'text-emerald-400 font-bold';
 
         return `
-          <div class="inner-tile px-3 py-2 flex justify-between items-center">
-            <div class="flex items-center gap-2">
-              <span class="font-bold text-sm sm:text-base text-white">${dep.destinationDisplay.frontText}</span>
+          <div class="inner-tile px-2.5 py-2 flex items-center justify-between gap-1.5 min-w-0">
+            <!-- Venstre del: Destinasjon + Sanntid-tagg (Aldri linjeskift) -->
+            <div class="flex items-center gap-1.5 min-w-0 flex-1 overflow-hidden">
+              <span class="font-bold text-xs sm:text-sm text-white truncate whitespace-nowrap block" title="${dep.destinationDisplay.frontText}">
+                ${dep.destinationDisplay.frontText}
+              </span>
               ${dep.realtime 
-                ? '<span class="text-[9px] bg-emerald-500/20 text-emerald-300 font-bold px-1.5 py-0.5 rounded border border-emerald-500/40 uppercase">Sanntid</span>' 
-                : '<span class="text-[9px] bg-slate-700 text-slate-200 font-medium px-1.5 py-0.5 rounded uppercase">Rute</span>'}
+                ? '<span class="text-[9px] bg-emerald-500/20 text-emerald-300 font-bold px-1 py-0.5 rounded border border-emerald-500/40 uppercase whitespace-nowrap shrink-0">Sanntid</span>' 
+                : '<span class="text-[9px] bg-slate-700 text-slate-200 font-medium px-1 py-0.5 rounded uppercase whitespace-nowrap shrink-0">Rute</span>'}
             </div>
-            <div class="flex items-baseline gap-2">
-              <span class="text-slate-400 text-xs font-mono">(${exactClock})</span>
-              <span class="text-lg sm:text-xl font-mono ${urgencyClass} min-w-[55px] text-right">${timeText}</span>
+
+            <!-- Høyre del: Klokkeslett + Nedtelling (Fast bredde, aldri linjeskift) -->
+            <div class="flex items-baseline justify-end gap-1.5 shrink-0 whitespace-nowrap">
+              <span class="text-slate-400 text-[11px] sm:text-xs font-mono">(${exactClock})</span>
+              <span class="text-base sm:text-lg font-mono ${urgencyClass} text-right min-w-[50px] inline-block font-black">${timeText}</span>
             </div>
           </div>
         `;
@@ -356,7 +361,6 @@
         for (let i = 0; i < hourly.time.length; i++) {
           const t = new Date(hourly.time[i]);
           
-          // Vis de neste 6-7 timene fra nå
           if (t >= now && count < 6) {
             count++;
             const hourLabel = `${String(t.getHours()).padStart(2, '0')}:00`;
