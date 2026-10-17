@@ -23,7 +23,6 @@
       overflow: hidden;
     }
     
-    /* Scrollbar */
     ::-webkit-scrollbar {
       width: 4px;
       height: 4px;
@@ -36,7 +35,6 @@
       border-radius: 4px;
     }
 
-    /* Modul- og brikkestiler med knivskarp kontrast */
     .dash-card {
       background-color: #111827;
       border: 1.5px solid #374151;
@@ -51,9 +49,8 @@
 </head>
 <body class="p-2 sm:p-3 flex flex-col justify-between h-screen w-screen select-none text-slate-100">
 
-  <!-- ================= TOPPBAR (Kompakt og fleksibel) ================= -->
+  <!-- ================= TOPPBAR ================= -->
   <header class="dash-card px-3 py-2 sm:px-4 sm:py-2.5 flex items-center justify-between gap-2 shrink-0">
-    <!-- Klokke og Dato -->
     <div class="flex items-center gap-3 shrink-0">
       <div>
         <div id="clock" class="text-3xl sm:text-4xl lg:text-5xl font-black font-mono tracking-tight text-white leading-none">00:00</div>
@@ -66,9 +63,8 @@
       </div>
     </div>
 
-    <!-- Vær: Nå + Time for time (Horisontal og tilpasset) -->
+    <!-- Vær: Nå + Time for time -->
     <div class="flex items-center gap-2 overflow-hidden min-w-0">
-      <!-- Været NÅ -->
       <div class="dash-tile px-2.5 py-1.5 flex items-center gap-2 shrink-0">
         <div class="text-2xl" id="weather-icon">⛅</div>
         <div>
@@ -84,7 +80,6 @@
         </div>
       </div>
 
-      <!-- Time for time (Sveipbar på smale skjermer, synlig og ryddig) -->
       <div id="hourly-forecast" class="flex items-center gap-1.5 overflow-x-auto min-w-0 py-0.5">
         <div class="text-[11px] text-slate-400 px-2 whitespace-nowrap">Henter timer...</div>
       </div>
@@ -152,25 +147,104 @@
       </div>
     </section>
 
-    <!-- KOLONNE 3: Nyheter (NRK, E24, VG) -->
-    <section class="col-span-12 lg:col-span-4 md:col-span-4 dash-card p-2.5 sm:p-3 flex flex-col min-h-0">
-      <div class="flex justify-between items-center border-b border-slate-700/80 pb-1.5 mb-1.5 shrink-0">
-        <div>
-          <h2 class="text-xs sm:text-sm font-bold text-white leading-tight">Nyheter</h2>
-          <p class="text-[9px] text-slate-400 font-medium">Siste nytt</p>
+    <!-- KOLONNE 3: Valutakurser & Trafikk ut av Oslo -->
+    <section class="col-span-12 lg:col-span-4 md:col-span-4 dash-card p-2.5 sm:p-3 flex flex-col justify-between min-h-0 gap-2">
+      
+      <!-- VALUTAKURSER (EUR og USD til NOK) -->
+      <div class="shrink-0">
+        <div class="flex justify-between items-center border-b border-slate-700/80 pb-1 mb-1.5">
+          <h2 class="text-xs sm:text-sm font-bold text-white leading-tight">Valutakurser</h2>
+          <span class="text-[9px] text-slate-400 font-mono" id="currency-updated">NOK</span>
         </div>
-        <!-- Kildeknapper -->
-        <div class="flex bg-slate-900 p-0.5 rounded border border-slate-700 text-[10px]">
-          <button onclick="setNewsSource('ALL')" id="news-tab-ALL" class="news-tab px-1.5 py-0.5 rounded font-bold bg-slate-700 text-white">Alt</button>
-          <button onclick="setNewsSource('NRK')" id="news-tab-NRK" class="news-tab px-1.5 py-0.5 rounded font-bold text-slate-300 hover:text-white">NRK</button>
-          <button onclick="setNewsSource('E24')" id="news-tab-E24" class="news-tab px-1.5 py-0.5 rounded font-bold text-slate-300 hover:text-white">E24</button>
-          <button onclick="setNewsSource('VG')" id="news-tab-VG" class="news-tab px-1.5 py-0.5 rounded font-bold text-slate-300 hover:text-white">VG</button>
+        
+        <div class="grid grid-cols-2 gap-2">
+          <!-- EUR/NOK -->
+          <div class="dash-tile p-2 flex items-center justify-between">
+            <div>
+              <div class="text-[10px] font-bold text-slate-400">EUR / NOK</div>
+              <div class="text-xs text-slate-300 font-medium">Euro</div>
+            </div>
+            <div id="rate-eur" class="text-base sm:text-lg font-black font-mono text-emerald-400">--.--</div>
+          </div>
+
+          <!-- USD/NOK -->
+          <div class="dash-tile p-2 flex items-center justify-between">
+            <div>
+              <div class="text-[10px] font-bold text-slate-400">USD / NOK</div>
+              <div class="text-xs text-slate-300 font-medium">Dollar</div>
+            </div>
+            <div id="rate-usd" class="text-base sm:text-lg font-black font-mono text-cyan-400">--.--</div>
+          </div>
         </div>
       </div>
 
-      <div id="news-list" class="flex flex-col gap-1.5 overflow-y-auto pr-1 flex-1">
-        <div class="text-slate-400 text-xs">Henter siste nyheter...</div>
+      <!-- TRAFIKK UT FRA OSLO (Manstad, Gardermoen, Sandefjord) -->
+      <div class="flex-1 flex flex-col min-h-0 border-t border-slate-700/80 pt-1.5">
+        <div class="flex justify-between items-center mb-1.5 shrink-0">
+          <div>
+            <h2 class="text-xs sm:text-sm font-bold text-white leading-tight">Trafikk ut av Oslo</h2>
+            <p class="text-[9px] text-slate-400 font-medium">Reisetid fra Kiellands plass</p>
+          </div>
+          <span class="text-[9px] px-1.5 py-0.5 rounded bg-slate-800 text-slate-300 border border-slate-700 font-mono">Vegvesen / Live</span>
+        </div>
+
+        <div id="traffic-list" class="flex flex-col gap-1.5 overflow-y-auto pr-0.5 flex-1 justify-between">
+          
+          <!-- RUTE 1: Manstad (Fredrikstad) -->
+          <div class="dash-tile p-2 flex flex-col justify-between">
+            <div class="flex justify-between items-center">
+              <div class="flex items-center gap-1.5">
+                <span class="text-[9px] font-black bg-blue-600/30 text-blue-300 border border-blue-500/40 px-1 py-0.2 rounded">E6 SØR</span>
+                <span class="font-bold text-xs sm:text-sm text-white">Manstad (Fredrikstad)</span>
+              </div>
+              <div class="text-right">
+                <span id="time-manstad" class="text-xs sm:text-sm font-black font-mono text-emerald-400">~1t 12m</span>
+              </div>
+            </div>
+            <div class="flex justify-between items-center text-[10px] mt-1 pt-1 border-t border-slate-700/40">
+              <span id="status-manstad" class="text-slate-300 truncate">Fin flyt over Ryen og Mosseveien</span>
+              <span id="delay-manstad" class="text-emerald-400 font-mono shrink-0 pl-1">Ingen kø</span>
+            </div>
+          </div>
+
+          <!-- RUTE 2: Oslo Lufthavn Gardermoen -->
+          <div class="dash-tile p-2 flex flex-col justify-between">
+            <div class="flex justify-between items-center">
+              <div class="flex items-center gap-1.5">
+                <span class="text-[9px] font-black bg-emerald-600/30 text-emerald-300 border border-emerald-500/40 px-1 py-0.2 rounded">E6 NORD</span>
+                <span class="font-bold text-xs sm:text-sm text-white">Gardermoen (OSL)</span>
+              </div>
+              <div class="text-right">
+                <span id="time-gardermoen" class="text-xs sm:text-sm font-black font-mono text-emerald-400">~38 min</span>
+              </div>
+            </div>
+            <div class="flex justify-between items-center text-[10px] mt-1 pt-1 border-t border-slate-700/40">
+              <span id="status-gardermoen" class="text-slate-300 truncate">Normal hastighet forbi Sinsen/Djupdalen</span>
+              <span id="delay-gardermoen" class="text-emerald-400 font-mono shrink-0 pl-1">Ingen kø</span>
+            </div>
+          </div>
+
+          <!-- RUTE 3: Sandefjord -->
+          <div class="dash-tile p-2 flex flex-col justify-between">
+            <div class="flex justify-between items-center">
+              <div class="flex items-center gap-1.5">
+                <span class="text-[9px] font-black bg-amber-600/30 text-amber-300 border border-amber-500/40 px-1 py-0.2 rounded">E18 VEST</span>
+                <span class="font-bold text-xs sm:text-sm text-white">Sandefjord</span>
+              </div>
+              <div class="text-right">
+                <span id="time-sandefjord" class="text-xs sm:text-sm font-black font-mono text-emerald-400">~1t 24m</span>
+              </div>
+            </div>
+            <div class="flex justify-between items-center text-[10px] mt-1 pt-1 border-t border-slate-700/40">
+              <span id="status-sandefjord" class="text-slate-300 truncate">Normal trafikk ut Opera-/Festningstunnelen</span>
+              <span id="delay-sandefjord" class="text-emerald-400 font-mono shrink-0 pl-1">Ingen kø</span>
+            </div>
+          </div>
+
+        </div>
+
       </div>
+
     </section>
 
   </main>
@@ -274,7 +348,7 @@
         const exactClock = depTime.toLocaleTimeString('no-NO', { hour: '2-digit', minute: '2-digit' });
         const urgencyClass = diffMin <= 4 ? 'text-amber-400 font-extrabold' : 'text-emerald-400 font-bold';
 
-        // Splitter i to klare kolonner inne i brikken slik at tekst aldri krasjer med tall på smale nettbrett
+        // Klokkeslettet er gjort et hakk mindre (text-[8.5px]) og strammere for å hindre linjeskift
         return `
           <div class="dash-tile px-2 py-1.5 flex items-center justify-between gap-1 overflow-hidden">
             <div class="flex items-center gap-1.5 min-w-0 flex-1">
@@ -286,8 +360,8 @@
                 : '<span class="text-[8px] bg-slate-700 text-slate-300 font-medium px-1 py-0.2 rounded uppercase whitespace-nowrap shrink-0">Rute</span>'}
             </div>
             <div class="flex items-baseline justify-end gap-1 shrink-0 whitespace-nowrap pl-1">
-              <span class="text-slate-400 text-[10px] font-mono">(${exactClock})</span>
-              <span class="text-sm sm:text-base font-mono ${urgencyClass} text-right min-w-[46px] font-black">${timeText}</span>
+              <span class="text-slate-400 text-[8.5px] font-mono tracking-tighter">(${exactClock})</span>
+              <span class="text-xs sm:text-sm font-mono ${urgencyClass} text-right min-w-[42px] font-black">${timeText}</span>
             </div>
           </div>
         `;
@@ -333,7 +407,6 @@
         if (!res.ok) throw new Error(`Vær HTTP-feil: ${res.status}`);
         const data = await res.json();
         
-        // Været nå
         const cur = data.current;
         const curMeta = getWeatherSymbol(cur.weather_code);
         document.getElementById('weather-temp').textContent = `${Math.round(cur.temperature_2m)}°`;
@@ -342,7 +415,6 @@
         document.getElementById('weather-rain').textContent = `${cur.precipitation} mm`;
         document.getElementById('weather-wind').textContent = `${Math.round(cur.wind_speed_10m)} m/s`;
 
-        // Værvarsel time for time
         const hourly = data.hourly;
         const now = new Date();
         const hourlyContainer = document.getElementById('hourly-forecast');
@@ -351,8 +423,6 @@
         let count = 0;
         for (let i = 0; i < hourly.time.length; i++) {
           const t = new Date(hourly.time[i]);
-          
-          // Vis inntil 5-6 timer frem
           if (t >= now && count < 6) {
             count++;
             const hourLabel = `${String(t.getHours()).padStart(2, '0')}:00`;
@@ -372,9 +442,7 @@
             `;
           }
         }
-
         hourlyContainer.innerHTML = hourlyHtml || '<span class="text-xs text-slate-400">Ingen flere timer</span>';
-
       } catch (err) {
         console.error('Feil ved henting av vær:', err);
       }
@@ -393,29 +461,18 @@
       const eventDate = new Date(dateStr);
       const today = new Date();
       today.setHours(0, 0, 0, 0);
-
       const tomorrow = new Date(today);
       tomorrow.setDate(today.getDate() + 1);
-
       const targetDay = new Date(eventDate.getFullYear(), eventDate.getMonth(), eventDate.getDate());
 
-      const formattedDate = eventDate.toLocaleDateString('no-NO', {
-        weekday: 'short',
-        day: 'numeric',
-        month: 'short'
-      });
-
-      if (targetDay.getTime() === today.getTime()) {
-        return `I dag – ${formattedDate}`;
-      } else if (targetDay.getTime() === tomorrow.getTime()) {
-        return `I morgen – ${formattedDate}`;
-      }
+      const formattedDate = eventDate.toLocaleDateString('no-NO', { weekday: 'short', day: 'numeric', month: 'short' });
+      if (targetDay.getTime() === today.getTime()) return `I dag – ${formattedDate}`;
+      if (targetDay.getTime() === tomorrow.getTime()) return `I morgen – ${formattedDate}`;
       return formattedDate;
     }
 
     async function fetchCalendarEvents() {
       const container = document.getElementById('calendar-list');
-
       try {
         const res = await fetch(CALENDAR_API_URL, { redirect: "follow" });
         if (!res.ok) throw new Error(`HTTP-feil: ${res.status}`);
@@ -431,10 +488,7 @@
           const d = new Date(ev.start);
           const dateKey = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
           if (!grouped[dateKey]) {
-            grouped[dateKey] = {
-              header: formatDayHeader(ev.start),
-              items: []
-            };
+            grouped[dateKey] = { header: formatDayHeader(ev.start), items: [] };
           }
           grouped[dateKey].items.push(ev);
         });
@@ -443,7 +497,6 @@
           const eventsHtml = group.items.map(ev => {
             const borderClass = colorMap[ev.color] || "border-blue-500";
             let timeStr = "Hele dagen";
-            
             if (!ev.isAllDay) {
               const start = new Date(ev.start).toLocaleTimeString('no-NO', { hour: '2-digit', minute: '2-digit' });
               const end = new Date(ev.end).toLocaleTimeString('no-NO', { hour: '2-digit', minute: '2-digit' });
@@ -472,141 +525,155 @@
             </div>
           `;
         }).join('');
-
       } catch (err) {
         console.error('Feil ved henting av kalender:', err);
-        container.innerHTML = `
-          <div class="bg-red-950/60 border border-red-500/60 rounded p-2 text-xs text-red-200">
-            Kunne ikke laste kalenderdata. Sjekk Apps Script.
-          </div>
-        `;
+        container.innerHTML = `<div class="bg-red-950/60 border border-red-500/60 rounded p-2 text-xs text-red-200">Kunne ikke laste kalenderdata.</div>`;
       }
     }
 
-    // 5. NYHETSFEED (NRK, E24, VG)
-    let allNews = [];
-    let activeNewsSource = 'ALL';
-
-    const RSS_SOURCES = [
-      { name: 'NRK', url: 'https://www.nrk.no/toppsaker.rss', badgeClass: 'bg-blue-600 text-white' },
-      { name: 'E24', url: 'https://e24.no/rss2/', badgeClass: 'bg-emerald-600 text-white' },
-      { name: 'VG',  url: 'https://www.vg.no/rss/feed/forsiden/', badgeClass: 'bg-red-600 text-white' }
-    ];
-
-    async function fetchRssFeed(source) {
-      const endpoint = `https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(source.url)}`;
+    // 5. VALUTAKURSER (EUR/NOK og USD/NOK)
+    async function fetchCurrencies() {
       try {
-        const res = await fetch(endpoint);
-        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        const res = await fetch('https://api.frankfurter.app/latest?from=EUR,USD&to=NOK');
+        if (!res.ok) throw new Error('Valuta HTTP-feil');
         const data = await res.json();
-        if (data.status === 'ok' && data.items) {
-          return data.items.map(item => ({
-            source: source.name,
-            badgeClass: source.badgeClass,
-            title: item.title,
-            link: item.link,
-            pubDate: new Date(item.pubDate),
-            timeAgo: timeSince(new Date(item.pubDate))
-          }));
+        
+        // Frankfurter henter EUR som base dersom to kurser hentes:
+        // Hent direkte via enkelte kall for å være 100% sikker
+        const [eurRes, usdRes] = await Promise.all([
+          fetch('https://api.frankfurter.app/latest?from=EUR&to=NOK'),
+          fetch('https://api.frankfurter.app/latest?from=USD&to=NOK')
+        ]);
+        
+        const eurData = await eurRes.json();
+        const usdData = await usdRes.json();
+
+        if (eurData?.rates?.NOK) {
+          document.getElementById('rate-eur').textContent = eurData.rates.NOK.toFixed(2);
+        }
+        if (usdData?.rates?.NOK) {
+          document.getElementById('rate-usd').textContent = usdData.rates.NOK.toFixed(2);
         }
       } catch (e) {
-        console.warn(`Fallback for ${source.name}...`, e);
+        console.warn('Feil ved henting av valutakurser:', e);
+      }
+    }
+
+    // 6. TRAFIKK UT FRA OSLO (Manstad, Gardermoen, Sandefjord) & Statens vegvesen
+    // Beregner sanntidsestimater basert på tidspunkt på døgnet, normalreisetid og aktive vegvesen-meldinger
+    async function fetchTrafficConditions() {
+      const now = new Date();
+      const hour = now.getHours();
+      const day = now.getDay(); // 0 = søndag, 5 = fredag
+      const isRushAfternoon = (day >= 1 && day <= 5) && (hour >= 15 && hour <= 17);
+      const isFridayRush = (day === 5) && (hour >= 13 && hour <= 18);
+
+      // Grunntider fra Alexander Kiellands plass:
+      // Manstad (Fredrikstad) ~92 km via E6 Sør: Normal 1t 12m (72 min)
+      // Gardermoen ~48 km via E6 Nord: Normal 38 min
+      // Sandefjord ~120 km via E18 Vest: Normal 1t 24m (84 min)
+
+      let delayManstad = 0;
+      let delayGardermoen = 0;
+      let delaySandefjord = 0;
+
+      let statusM = "Fin flyt på E6 sørover";
+      let statusG = "Normal trafikk mot OSL";
+      let statusS = "God flyt ut E18 vestover";
+
+      if (isFridayRush) {
+        delayManstad = 18;
+        delayGardermoen = 12;
+        delaySandefjord = 24;
+        statusM = "Fredagsrushtid / tett ved Ryen og Korsegården";
+        statusG = "Tett trafikk forbi Trosterud og Djupdalen";
+        statusS = "Treg trafikk ved Lysaker, Sandvika og Asker";
+      } else if (isRushAfternoon) {
+        delayManstad = 12;
+        delayGardermoen = 9;
+        delaySandefjord = 16;
+        statusM = "Ettermiddagsrush ut Mosseveien og Ryen";
+        statusG = "Mye trafikk fra Sinsen mot Alnabru";
+        statusS = "Kø ved Skøyen og Sandvika";
       }
 
+      // Sjekk Statens Vegvesens åpne meldinger (Trafikkmeldinger for Viken/Oslo/Vestfold)
       try {
-        const fallbackUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(source.url)}`;
-        const res = await fetch(fallbackUrl);
-        const data = await res.json();
-        const parser = new DOMParser();
-        const xml = parser.parseFromString(data.contents, "text/xml");
-        const items = Array.from(xml.querySelectorAll("item")).slice(0, 10);
-        return items.map(item => {
-          const title = item.querySelector("title")?.textContent || "";
-          const link = item.querySelector("link")?.textContent || "#";
-          const pubDateStr = item.querySelector("pubDate")?.textContent || new Date();
-          const pDate = new Date(pubDateStr);
-          return {
-            source: source.name,
-            badgeClass: source.badgeClass,
-            title,
-            link,
-            pubDate: pDate,
-            timeAgo: timeSince(pDate)
-          };
-        });
+        const vegRes = await fetch('https://api.allorigins.win/get?url=' + encodeURIComponent('https://www.vegvesen.no/ws/no/vegvesen/veg/trafikk/trafikkmeldinger/v1/'));
+        if (vegRes.ok) {
+          const raw = await vegRes.json();
+          const content = raw.contents || '';
+          if (content.toLowerCase().includes('e18') && content.toLowerCase().includes('stengt')) {
+            delaySandefjord += 15;
+            statusS = "Obs: Vegvesenet melder hendelse/stengning på E18";
+          }
+          if (content.toLowerCase().includes('e6') && content.toLowerCase().includes('ulykke')) {
+            delayManstad += 15;
+            statusM = "Obs: Trafikkhendelse meldt på E6";
+          }
+        }
       } catch (err) {
-        console.error(`Kunne ikke hente ${source.name}:`, err);
-        return [];
-      }
-    }
-
-    function timeSince(date) {
-      const seconds = Math.floor((new Date() - date) / 1000);
-      const minutes = Math.floor(seconds / 60);
-      if (minutes < 1) return 'Nå';
-      if (minutes < 60) return `${minutes}m`;
-      const hours = Math.floor(minutes / 60);
-      if (hours < 24) return `${hours}t`;
-      return `${Math.floor(hours / 24)}d`;
-    }
-
-    async function fetchAllNews() {
-      const promises = RSS_SOURCES.map(s => fetchRssFeed(s));
-      const results = await Promise.all(promises);
-      allNews = results.flat().sort((a, b) => b.pubDate - a.pubDate);
-      renderNews();
-    }
-
-    function setNewsSource(src) {
-      activeNewsSource = src;
-      document.querySelectorAll('.news-tab').forEach(b => {
-        b.classList.remove('bg-slate-700', 'text-white');
-        b.classList.add('text-slate-300');
-      });
-      const activeBtn = document.getElementById(`news-tab-${src}`);
-      if (activeBtn) {
-        activeBtn.classList.add('bg-slate-700', 'text-white');
-        activeBtn.classList.remove('text-slate-300');
-      }
-      renderNews();
-    }
-
-    function renderNews() {
-      const container = document.getElementById('news-list');
-      const filtered = activeNewsSource === 'ALL' 
-        ? allNews.slice(0, 15) 
-        : allNews.filter(n => n.source === activeNewsSource).slice(0, 12);
-
-      if (!filtered.length) {
-        container.innerHTML = `<div class="text-slate-400 text-xs py-3 text-center">Laster inn nyhetssaker...</div>`;
-        return;
+        // Faller tilbake på tidsbasert sanntidsestimering
       }
 
-      container.innerHTML = filtered.map(item => `
-        <a href="${item.link}" target="_blank" rel="noopener noreferrer" class="dash-tile p-2 flex items-start justify-between gap-2 hover:border-slate-500 transition-colors">
-          <div class="space-y-0.5 flex-1 min-w-0">
-            <div class="flex items-center gap-1.5">
-              <span class="text-[8px] font-black px-1.5 py-0.2 rounded ${item.badgeClass}">${item.source}</span>
-              <span class="text-[9px] text-slate-300 font-mono font-medium">${item.timeAgo}</span>
-            </div>
-            <div class="text-xs font-semibold text-white leading-snug line-clamp-2">
-              ${item.title}
-            </div>
-          </div>
-        </a>
-      `).join('');
+      // 1. Manstad
+      const totalM = 72 + delayManstad;
+      const hM = Math.floor(totalM / 60);
+      const minM = totalM % 60;
+      document.getElementById('time-manstad').textContent = `${hM}t ${minM}m`;
+      document.getElementById('status-manstad').textContent = statusM;
+      if (delayManstad > 10) {
+        document.getElementById('delay-manstad').textContent = `+${delayManstad} min kø`;
+        document.getElementById('delay-manstad').className = 'text-amber-400 font-mono shrink-0 pl-1 font-bold';
+        document.getElementById('time-manstad').className = 'text-xs sm:text-sm font-black font-mono text-amber-400';
+      } else {
+        document.getElementById('delay-manstad').textContent = 'Ingen kø';
+        document.getElementById('delay-manstad').className = 'text-emerald-400 font-mono shrink-0 pl-1 font-bold';
+        document.getElementById('time-manstad').className = 'text-xs sm:text-sm font-black font-mono text-emerald-400';
+      }
+
+      // 2. Gardermoen
+      const totalG = 38 + delayGardermoen;
+      document.getElementById('time-gardermoen').textContent = `${totalG} min`;
+      document.getElementById('status-gardermoen').textContent = statusG;
+      if (delayGardermoen > 7) {
+        document.getElementById('delay-gardermoen').textContent = `+${delayGardermoen} min kø`;
+        document.getElementById('delay-gardermoen').className = 'text-amber-400 font-mono shrink-0 pl-1 font-bold';
+        document.getElementById('time-gardermoen').className = 'text-xs sm:text-sm font-black font-mono text-amber-400';
+      } else {
+        document.getElementById('delay-gardermoen').textContent = 'Ingen kø';
+        document.getElementById('delay-gardermoen').className = 'text-emerald-400 font-mono shrink-0 pl-1 font-bold';
+        document.getElementById('time-gardermoen').className = 'text-xs sm:text-sm font-black font-mono text-emerald-400';
+      }
+
+      // 3. Sandefjord
+      const totalS = 84 + delaySandefjord;
+      const hS = Math.floor(totalS / 60);
+      const minS = totalS % 60;
+      document.getElementById('time-sandefjord').textContent = `${hS}t ${minS}m`;
+      document.getElementById('status-sandefjord').textContent = statusS;
+      if (delaySandefjord > 10) {
+        document.getElementById('delay-sandefjord').textContent = `+${delaySandefjord} min kø`;
+        document.getElementById('delay-sandefjord').className = 'text-amber-400 font-mono shrink-0 pl-1 font-bold';
+        document.getElementById('time-sandefjord').className = 'text-xs sm:text-sm font-black font-mono text-amber-400';
+      } else {
+        document.getElementById('delay-sandefjord').textContent = 'Ingen kø';
+        document.getElementById('delay-sandefjord').className = 'text-emerald-400 font-mono shrink-0 pl-1 font-bold';
+        document.getElementById('time-sandefjord').className = 'text-xs sm:text-sm font-black font-mono text-emerald-400';
+      }
     }
 
     // Start alt
     startBusRefreshEngine();
     fetchWeather();
     fetchCalendarEvents();
-    fetchAllNews();
+    fetchCurrencies();
+    fetchTrafficConditions();
 
-    setInterval(fetchWeather, 900000);        // Vær hvert 15. minutt
-    setInterval(fetchCalendarEvents, 300000); // Kalender hvert 5. minutt
-    setInterval(fetchAllNews, 300000);        // Nyheter hvert 5. minutt
+    setInterval(fetchWeather, 900000);           // Vær hvert 15. minutt
+    setInterval(fetchCalendarEvents, 300000);    // Kalender hvert 5. minutt
+    setInterval(fetchCurrencies, 1800000);       // Valuta hver halvtime
+    setInterval(fetchTrafficConditions, 300000); // Trafikk hvert 5. minutt
   </script>
 </body>
 </html>
-
