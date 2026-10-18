@@ -150,7 +150,7 @@
 
     </section>
 
-    <!-- KOLONNE 2: Google Kalender -->
+    <!-- KOLONNE 2: Google Kalender (Viser all informasjon fra Google scriptet + alle helligdager) -->
     <section class="col-span-12 lg:col-span-4 md:col-span-4 dash-card p-2.5 sm:p-3 flex flex-col min-h-0">
       <div class="flex justify-between items-center border-b border-slate-700/80 pb-1.5 mb-1.5 shrink-0">
         <div>
@@ -523,7 +523,7 @@
       }
     }
 
-    // 4. GOOGLE KALENDER
+    // 4. GOOGLE KALENDER – VISER ALL DATA FRA GOOGLE SCRIPTET + ÅPEN API FOR NORSKE HELLIGDAGER
     const CALENDAR_API_URL = "https://script.google.com/macros/s/AKfycbw81NLZFBBq2e09NJyxsRHNsyIUfjjo5xD_pn6tkNR-lSJAHV6SUA05_-iF6ztDqe5RlQ/exec";
 
     const colorMap = {
@@ -532,15 +532,40 @@
       emerald: "border-emerald-500"
     };
 
-    function formatDayHeader(dateStr) {
-      const eventDate = new Date(dateStr);
+    let cachedHolidays = {};
+
+    // Henter offisielle norske helligdager via det åpne Nager.Date API-et
+    async function fetchNorwegianHolidays(years) {
+      const holidays = {};
+      const uniqueYears = [...new Set(years)];
+      
+      const promises = uniqueYears.map(async (yr) => {
+        try {
+          const res = await fetch(`https://date.nager.at/api/v3/PublicHolidays/${yr}/NO`);
+          if (res.ok) {
+            const list = await res.json();
+            list.forEach(h => {
+              holidays[h.date] = h.localName;
+            });
+          }
+        } catch (err) {
+          console.warn(`Kunne ikke hente helligdager fra API for år ${yr}:`, err);
+        }
+      });
+
+      await Promise.all(promises);
+      return holidays;
+    }
+
+    function formatDayHeader(dateObj) {
       const today = new Date();
       today.setHours(0, 0, 0, 0);
       const tomorrow = new Date(today);
       tomorrow.setDate(today.getDate() + 1);
-      const targetDay = new Date(eventDate.getFullYear(), eventDate.getMonth(), eventDate.getDate());
 
-      const formattedDate = eventDate.toLocaleDateString('no-NO', { weekday: 'short', day: 'numeric', month: 'short' });
+      const targetDay = new Date(dateObj.getFullYear(), dateObj.getMonth(), dateObj.getDate());
+      const formattedDate = dateObj.toLocaleDateString('no-NO', { weekday: 'short', day: 'numeric', month: 'short' });
+
       if (targetDay.getTime() === today.getTime()) return `I dag – ${formattedDate}`;
       if (targetDay.getTime() === tomorrow.getTime()) return `I morgen – ${formattedDate}`;
       return formattedDate;
@@ -551,55 +576,179 @@
       try {
         const res = await fetch(CALENDAR_API_URL, { redirect: "follow" });
         if (!res.ok) throw new Error(`HTTP-feil: ${res.status}`);
-        const events = await res.json();
+        const rawEvents = await res.json();
 
-        if (!events.length) {
+        const today = new Date();
+        today.setHours(0, 0, 0, 0);
+
+        // 1. Finn tidsspenn (fra i dag til seneste hendelse i kalenderen eller minimum 30 dager frem)
+        let maxHorizonDate = new Date(today);
+        maxHorizonDate.setDate(today.getDate() + 30);
+
+        const yearsToFetch = [today.getFullYear(), today.getFullYear() + 1];
+        rawEvents.forEach(ev => {
+          if (ev.start) {
+            const sDate = new Date(ev.start);
+            if (sDate > maxHorizonDate) maxHorizonDate = new Date(sDate);
+            const yr = sDate.getFullYear();
+            if (yr && !yearsToFetch.includes(yr)) yearsToFetch.push(yr);
+          }
+          if (ev.end) {
+            const eDate = new Date(ev.end);
+            if (eDate > maxHorizonDate) maxHorizonDate = new Date(eDate);
+            const yr = eDate.getFullYear();
+            if (yr && !yearsToFetch.includes(yr)) yearsToFetch.push(yr);
+          }
+        });
+
+        // 2. Hent helligdager fra åpent API for alle relevante år
+        if (Object.keys(cachedHolidays).length === 0) {
+          cachedHolidays = await fetchNorwegianHolidays(yearsToFetch);
+        }
+
+        const grouped = {};
+
+        const getOrCreateGroup = (d) => {
+          const dateKey = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+          if (!grouped[dateKey]) {
+            grouped[dateKey] = {
+              dateKey: dateKey,
+              dateObj: new Date(d),
+              header: formatDayHeader(d),
+              holiday: cachedHolidays[dateKey] || null,
+              items: []
+            };
+          }
+          return grouped[dateKey];
+        };
+
+        // Alltid opprett i dag og i morgen
+        getOrCreateGroup(today);
+        const tomorrow = new Date(today);
+        tomorrow.setDate(today.getDate() + 1);
+        getOrCreateGroup(tomorrow);
+
+        // 3. LEGG INN ALLE HELLIGDAGER I TIDSHORISONTEN (UAVHENGIG OM DET ER ANDRE AVTALER ELLER IKKE!)
+        Object.keys(cachedHolidays).forEach(dateStr => {
+          const [y, m, d] = dateStr.split('-').map(Number);
+          const hDate = new Date(y, m - 1, d);
+          hDate.setHours(0, 0, 0, 0);
+
+          // Hvis helligdagen er fra i dag og innenfor kalenderens tidsspenn
+          if (hDate >= today && hDate <= maxHorizonDate) {
+            getOrCreateGroup(hDate);
+          }
+        });
+
+        // 4. Behandle ALLE hendelser fra Google Apps Scriptet
+        rawEvents.forEach(ev => {
+          const startDt = new Date(ev.start);
+          const endDt = new Date(ev.end);
+
+          const startDay = new Date(startDt.getFullYear(), startDt.getMonth(), startDt.getDate());
+          let endDay = new Date(endDt.getFullYear(), endDt.getMonth(), endDt.getDate());
+
+          // Korriger Google Calendars eksklusive midnatt på heldagshendelser
+          if (ev.isAllDay && endDt.getTime() > startDt.getTime()) {
+            if (endDt.getHours() === 0 && endDt.getMinutes() === 0) {
+              endDay.setDate(endDay.getDate() - 1);
+            }
+          } else if (!ev.isAllDay && endDt.getHours() === 0 && endDt.getMinutes() === 0 && endDay > startDay) {
+            endDay.setDate(endDay.getDate() - 1);
+          }
+
+          const oneDayMs = 1000 * 60 * 60 * 24;
+          const totalDays = Math.max(1, Math.round((endDay.getTime() - startDay.getTime()) / oneDayMs) + 1);
+          const isMultiDay = totalDays > 1;
+
+          // Utvid flerdagshendelser over alle dager de varer
+          for (let cur = new Date(startDay); cur <= endDay; cur.setDate(cur.getDate() + 1)) {
+            if (cur < today) continue; // Ikke vis forgangne dager
+
+            const group = getOrCreateGroup(cur);
+            const currentDayIndex = Math.round((cur.getTime() - startDay.getTime()) / oneDayMs) + 1;
+
+            let timeStr = "Hele dagen";
+            if (!ev.isAllDay) {
+              if (isMultiDay) {
+                if (currentDayIndex === 1) {
+                  timeStr = `Fra ${startDt.toLocaleTimeString('no-NO', { hour: '2-digit', minute: '2-digit' })}`;
+                } else if (currentDayIndex === totalDays) {
+                  timeStr = `Til ${endDt.toLocaleTimeString('no-NO', { hour: '2-digit', minute: '2-digit' })}`;
+                } else {
+                  timeStr = "Hele dagen";
+                }
+              } else {
+                const s = startDt.toLocaleTimeString('no-NO', { hour: '2-digit', minute: '2-digit' });
+                const e = endDt.toLocaleTimeString('no-NO', { hour: '2-digit', minute: '2-digit' });
+                timeStr = `${s}–${e}`;
+              }
+            }
+
+            group.items.push({
+              ...ev,
+              isMultiDay,
+              currentDayIndex,
+              totalDays,
+              displayTime: timeStr,
+              spanLabel: isMultiDay ? `Dag ${currentDayIndex}/${totalDays}` : null
+            });
+          }
+        });
+
+        // 5. Sorter alle dager kronologisk (viser alle dager med avtaler OG alle dager med helligdag)
+        const sortedGroups = Object.values(grouped)
+          .filter(g => g.items.length > 0 || g.holiday)
+          .sort((a, b) => a.dateObj.getTime() - b.dateObj.getTime());
+
+        if (!sortedGroups.length) {
           container.innerHTML = `<div class="text-slate-400 text-xs my-auto text-center py-4">Ingen planlagte hendelser 🎉</div>`;
           return;
         }
 
-        const grouped = {};
-        events.forEach(ev => {
-          const d = new Date(ev.start);
-          const dateKey = `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
-          if (!grouped[dateKey]) {
-            grouped[dateKey] = { header: formatDayHeader(ev.start), items: [] };
-          }
-          grouped[dateKey].items.push(ev);
-        });
-
-        container.innerHTML = Object.values(grouped).map(group => {
+        container.innerHTML = sortedGroups.map(group => {
           const eventsHtml = group.items.map(ev => {
             const borderClass = colorMap[ev.color] || "border-blue-500";
-            let timeStr = "Hele dagen";
-            if (!ev.isAllDay) {
-              const start = new Date(ev.start).toLocaleTimeString('no-NO', { hour: '2-digit', minute: '2-digit' });
-              const end = new Date(ev.end).toLocaleTimeString('no-NO', { hour: '2-digit', minute: '2-digit' });
-              timeStr = `${start}–${end}`;
-            }
 
             return `
               <div class="dash-tile border-l-4 ${borderClass} px-2 py-1.5 flex items-center justify-between">
-                <div class="overflow-hidden pr-1 min-w-0">
-                  <div class="font-bold text-xs text-white truncate">${ev.title}</div>
+                <div class="overflow-hidden pr-1 min-w-0 flex-1">
+                  <div class="flex items-center gap-1.5">
+                    <span class="font-bold text-xs text-white truncate">${ev.title}</span>
+                    ${ev.spanLabel ? `
+                      <span class="text-[7.5px] font-mono font-bold bg-amber-500/20 text-amber-300 border border-amber-500/40 px-1 py-0.2 rounded shrink-0">
+                        ${ev.spanLabel}
+                      </span>
+                    ` : ''}
+                  </div>
                   <div class="text-[10px] font-semibold text-slate-300 mt-0.5">${ev.owner || ''}</div>
                 </div>
-                <div class="text-[10px] font-mono bg-slate-800 border border-slate-700 px-1.5 py-0.5 rounded text-slate-100 whitespace-nowrap shrink-0">${timeStr}</div>
+                <div class="text-[10px] font-mono bg-slate-800 border border-slate-700 px-1.5 py-0.5 rounded text-slate-100 whitespace-nowrap shrink-0 ml-1">
+                  ${ev.displayTime}
+                </div>
               </div>
             `;
           }).join('');
 
+          // Helligdagen vises tydelig i overskriftslinjen til den aktuelle dagen.
+          // Hvis det ikke er andre avtaler den dagen, står datolinjen frem med helligdagsnotisen i rød skrift.
           return `
             <div class="space-y-1">
-              <div class="text-[9px] font-bold uppercase tracking-wider text-slate-400 sticky top-0 bg-slate-900/95 py-0.5 capitalize border-b border-slate-700/60">
-                ${group.header}
+              <div class="flex items-center justify-between text-[9px] font-bold uppercase tracking-wider text-slate-400 sticky top-0 bg-slate-900/95 py-0.5 border-b border-slate-700/60">
+                <span class="capitalize">${group.header}</span>
+                ${group.holiday ? `
+                  <span class="text-red-400 font-semibold tracking-normal lowercase text-[9.5px]">
+                    (${group.holiday})
+                  </span>
+                ` : ''}
               </div>
-              <div class="space-y-1.5">
+              <div class="space-y-1">
                 ${eventsHtml}
               </div>
             </div>
           `;
         }).join('');
+
       } catch (err) {
         console.error('Feil ved henting av kalender:', err);
         container.innerHTML = `<div class="bg-red-950/60 border border-red-500/60 rounded p-2 text-xs text-red-200">Kunne ikke laste kalenderdata.</div>`;
