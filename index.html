@@ -89,40 +89,59 @@
   <!-- ================= HOVEDINNHOLD (3 Kolonner) ================= -->
   <main class="grid grid-cols-12 gap-2 sm:gap-3 my-2 flex-1 min-h-0">
 
-    <!-- KOLONNE 1: Bussavganger (Entur Sanntid) -->
+    <!-- KOLONNE 1: Bussavganger (Komprimerte favoritter øverst + Generelle avganger nederst) -->
     <section class="col-span-12 lg:col-span-4 md:col-span-4 flex flex-col gap-2 min-h-0">
       
-      <!-- 54 mot Kjelsås -->
-      <div class="dash-card p-2.5 sm:p-3 flex-1 flex flex-col justify-between min-h-0">
-        <div class="flex justify-between items-center border-b border-slate-700/80 pb-1.5 shrink-0">
-          <div class="flex items-center gap-2">
-            <span class="bg-red-600 text-white font-black px-1.5 py-0.5 rounded text-sm sm:text-base leading-none">54</span>
-            <div>
-              <h2 class="text-xs sm:text-sm font-bold text-white leading-tight">Mot Kjelsås</h2>
-              <p class="text-[9px] text-slate-400">Kiellands plass</p>
+      <!-- ØVERST: Prioriterte avganger (54 mot Kjelsås & 21 mot Tjuvholmen) -->
+      <div class="dash-card p-2 sm:p-2.5 shrink-0 flex flex-col gap-1.5">
+        <div class="flex justify-between items-center border-b border-slate-700/80 pb-1">
+          <h2 class="text-xs sm:text-sm font-bold text-white leading-tight">Prioriterte ruter</h2>
+          <span class="text-[9px] text-slate-400 font-medium">Faste linjer</span>
+        </div>
+
+        <div class="flex flex-col gap-1.5">
+          <!-- 54 mot Kjelsås (Marius) -->
+          <div class="dash-tile px-2 py-1 flex flex-col gap-1">
+            <div class="flex justify-between items-center">
+              <div class="flex items-center gap-1.5">
+                <span class="bg-red-600 text-white font-black px-1.5 py-0.2 rounded text-[11px] leading-tight">54</span>
+                <span class="font-bold text-xs text-white">Mot Kjelsås</span>
+              </div>
+              <span class="text-[8.5px] font-bold bg-blue-500/20 text-blue-300 border border-blue-500/40 px-1.5 py-0.2 rounded-full">Marius</span>
+            </div>
+            <div id="bus-54-list" class="flex flex-col gap-1">
+              <div class="text-slate-400 text-[10px]">Henter avganger...</div>
             </div>
           </div>
-          <span class="text-[9px] font-bold bg-blue-500/20 text-blue-300 border border-blue-500/50 px-2 py-0.5 rounded-full">Marius</span>
-        </div>
-        <div id="bus-54-list" class="flex flex-col gap-1.5 my-auto pt-1.5">
-          <div class="text-slate-400 text-xs">Henter sanntidsavganger...</div>
+
+          <!-- 21 mot Tjuvholmen (Sara) -->
+          <div class="dash-tile px-2 py-1 flex flex-col gap-1">
+            <div class="flex justify-between items-center">
+              <div class="flex items-center gap-1.5">
+                <span class="bg-red-600 text-white font-black px-1.5 py-0.2 rounded text-[11px] leading-tight">21</span>
+                <span class="font-bold text-xs text-white">Mot Tjuvholmen</span>
+              </div>
+              <span class="text-[8.5px] font-bold bg-pink-500/20 text-pink-300 border border-pink-500/40 px-1.5 py-0.2 rounded-full">Sara</span>
+            </div>
+            <div id="bus-21-list" class="flex flex-col gap-1">
+              <div class="text-slate-400 text-[10px]">Henter avganger...</div>
+            </div>
+          </div>
         </div>
       </div>
 
-      <!-- 21 mot Tjuvholmen -->
-      <div class="dash-card p-2.5 sm:p-3 flex-1 flex flex-col justify-between min-h-0">
-        <div class="flex justify-between items-center border-b border-slate-700/80 pb-1.5 shrink-0">
-          <div class="flex items-center gap-2">
-            <span class="bg-red-600 text-white font-black px-1.5 py-0.5 rounded text-sm sm:text-base leading-none">21</span>
-            <div>
-              <h2 class="text-xs sm:text-sm font-bold text-white leading-tight">Mot Tjuvholmen</h2>
-              <p class="text-[9px] text-slate-400">Kiellands plass</p>
-            </div>
+      <!-- NEDERST: Generelle avganger fra Alexander Kiellands plass -->
+      <div class="dash-card p-2 sm:p-2.5 flex-1 flex flex-col min-h-0 justify-between">
+        <div class="flex justify-between items-center border-b border-slate-700/80 pb-1 mb-1.5 shrink-0">
+          <div>
+            <h2 class="text-xs sm:text-sm font-bold text-white leading-tight">Andre avganger</h2>
+            <p class="text-[9px] text-slate-400 font-medium">Fra Alexander Kiellands plass</p>
           </div>
-          <span class="text-[9px] font-bold bg-pink-500/20 text-pink-300 border border-pink-500/50 px-2 py-0.5 rounded-full">Sara</span>
+          <span class="text-[8.5px] bg-slate-800 text-slate-300 border border-slate-700 px-1.5 py-0.2 rounded font-mono">Alle linjer</span>
         </div>
-        <div id="bus-21-list" class="flex flex-col gap-1.5 my-auto pt-1.5">
-          <div class="text-slate-400 text-xs">Henter sanntidsavganger...</div>
+
+        <div id="bus-general-list" class="flex flex-col gap-1 overflow-y-auto pr-0.5 flex-1">
+          <div class="text-slate-400 text-xs py-2">Henter sanntidsavganger fra holdeplassen...</div>
         </div>
       </div>
 
@@ -282,7 +301,7 @@
     // 2. ENTUR SANNTID & 30-SEKUNDERS MOTOR
     const REFRESH_INTERVAL = 30;
     let secondsUntilNextFetch = REFRESH_INTERVAL;
-    let cachedDepartures = { next54: [], next21: [] };
+    let cachedDepartures = { next54: [], next21: [], general: [] };
 
     async function fetchBuses() {
       const query = `{
@@ -311,18 +330,31 @@
         const json = await res.json();
         const calls = json.data?.stopPlace?.estimatedCalls || [];
 
+        // 1. 54 mot Kjelsås
         cachedDepartures.next54 = calls.filter(c => 
           c.serviceJourney?.line?.publicCode === '54' && 
           c.destinationDisplay?.frontText?.toLowerCase().includes('kjelsås')
         ).slice(0, 2);
 
+        // 2. 21 mot Tjuvholmen
         cachedDepartures.next21 = calls.filter(c => 
           c.serviceJourney?.line?.publicCode === '21' && 
           c.destinationDisplay?.frontText?.toLowerCase().includes('tjuvholmen')
         ).slice(0, 2);
 
-        renderBusList('bus-54-list', cachedDepartures.next54);
-        renderBusList('bus-21-list', cachedDepartures.next21);
+        // 3. Generelle avganger fra Alexander Kiellands plass (andre linjer eller motstående retninger)
+        cachedDepartures.general = calls.filter(c => {
+          const line = c.serviceJourney?.line?.publicCode;
+          const dest = c.destinationDisplay?.frontText?.toLowerCase() || '';
+          // Vi viser andre linjer som 34, 33, 21 mot Helsfyr, 54 mot Tjuvholmen osv.
+          const isPrioritized54 = (line === '54' && dest.includes('kjelsås'));
+          const isPrioritized21 = (line === '21' && dest.includes('tjuvholmen'));
+          return !isPrioritized54 && !isPrioritized21;
+        }).slice(0, 6);
+
+        renderPrioritizedBusList('bus-54-list', cachedDepartures.next54);
+        renderPrioritizedBusList('bus-21-list', cachedDepartures.next21);
+        renderGeneralBusList('bus-general-list', cachedDepartures.general);
 
         document.getElementById('last-updated').textContent = 'Sist: ' + new Date().toLocaleTimeString('no-NO', { hour: '2-digit', minute: '2-digit' });
         document.getElementById('status-dot').className = 'w-2 h-2 rounded-full bg-emerald-500';
@@ -334,10 +366,11 @@
       }
     }
 
-    function renderBusList(elementId, departures) {
+    // Kompakt visning for de to prioriterte rutene øverst
+    function renderPrioritizedBusList(elementId, departures) {
       const container = document.getElementById(elementId);
       if (!departures || !departures.length) {
-        container.innerHTML = `<div class="text-slate-400 text-xs py-2">Ingen avganger funnet de neste 2 timene.</div>`;
+        container.innerHTML = `<div class="text-slate-400 text-[10px] py-1">Ingen avganger de neste 2 timene.</div>`;
         return;
       }
 
@@ -354,18 +387,54 @@
         const urgencyClass = diffMin <= 4 ? 'text-amber-400 font-extrabold' : 'text-emerald-400 font-bold';
 
         return `
-          <div class="dash-tile px-2 py-1.5 flex items-center justify-between gap-1 overflow-hidden">
+          <div class="flex items-center justify-between bg-slate-900/80 px-2 py-0.5 rounded border border-slate-700/50">
+            <div class="flex items-center gap-1.5 min-w-0">
+              <span class="text-xs font-semibold text-slate-200 truncate">${dep.destinationDisplay.frontText}</span>
+              ${dep.realtime 
+                ? '<span class="text-[7.5px] bg-emerald-500/20 text-emerald-300 font-bold px-1 py-0.2 rounded border border-emerald-500/30 uppercase">Sanntid</span>' 
+                : '<span class="text-[7.5px] bg-slate-800 text-slate-400 px-1 py-0.2 rounded uppercase">Rute</span>'}
+            </div>
+            <div class="flex items-baseline gap-1 shrink-0 whitespace-nowrap pl-1">
+              <span class="text-slate-400 text-[8.5px] font-mono tracking-tighter">(${exactClock})</span>
+              <span class="text-xs font-mono ${urgencyClass} min-w-[38px] text-right">${timeText}</span>
+            </div>
+          </div>
+        `;
+      }).join('');
+    }
+
+    // Visning for generelle avganger fra holdeplassen nederst
+    function renderGeneralBusList(elementId, departures) {
+      const container = document.getElementById(elementId);
+      if (!departures || !departures.length) {
+        container.innerHTML = `<div class="text-slate-400 text-xs py-2">Ingen andre avganger funnet.</div>`;
+        return;
+      }
+
+      container.innerHTML = departures.map(dep => {
+        const depTime = new Date(dep.expectedDepartureTime);
+        const diffSec = Math.floor((depTime - new Date()) / 1000);
+        const diffMin = Math.round(diffSec / 60);
+
+        let timeText = `${diffMin} min`;
+        if (diffSec <= 30 && diffSec >= -30) timeText = 'Nå';
+        else if (diffSec < -30) timeText = 'Gått';
+
+        const exactClock = depTime.toLocaleTimeString('no-NO', { hour: '2-digit', minute: '2-digit' });
+        const line = dep.serviceJourney?.line?.publicCode || 'Buss';
+        const urgencyClass = diffMin <= 4 ? 'text-amber-400 font-extrabold' : 'text-emerald-400 font-bold';
+
+        return `
+          <div class="dash-tile px-2 py-1 flex items-center justify-between gap-1 overflow-hidden">
             <div class="flex items-center gap-1.5 min-w-0 flex-1">
-              <span class="font-bold text-xs sm:text-sm text-white truncate block" title="${dep.destinationDisplay.frontText}">
+              <span class="bg-slate-700 text-white font-black px-1.5 py-0.2 rounded text-[10px] leading-tight shrink-0">${line}</span>
+              <span class="font-bold text-xs text-white truncate block" title="${dep.destinationDisplay.frontText}">
                 ${dep.destinationDisplay.frontText}
               </span>
-              ${dep.realtime 
-                ? '<span class="text-[8px] bg-emerald-500/20 text-emerald-300 font-bold px-1 py-0.2 rounded border border-emerald-500/40 uppercase whitespace-nowrap shrink-0">Sanntid</span>' 
-                : '<span class="text-[8px] bg-slate-700 text-slate-300 font-medium px-1 py-0.2 rounded uppercase whitespace-nowrap shrink-0">Rute</span>'}
             </div>
             <div class="flex items-baseline justify-end gap-1 shrink-0 whitespace-nowrap pl-1">
               <span class="text-slate-400 text-[8.5px] font-mono tracking-tighter">(${exactClock})</span>
-              <span class="text-xs sm:text-sm font-mono ${urgencyClass} text-right min-w-[42px] font-black">${timeText}</span>
+              <span class="text-xs font-mono ${urgencyClass} text-right min-w-[38px] font-black">${timeText}</span>
             </div>
           </div>
         `;
@@ -384,8 +453,9 @@
           await fetchBuses();
         } else {
           countdownEl.textContent = `${secondsUntilNextFetch}s`;
-          renderBusList('bus-54-list', cachedDepartures.next54);
-          renderBusList('bus-21-list', cachedDepartures.next21);
+          renderPrioritizedBusList('bus-54-list', cachedDepartures.next54);
+          renderPrioritizedBusList('bus-21-list', cachedDepartures.next21);
+          renderGeneralBusList('bus-general-list', cachedDepartures.general);
         }
       }, 1000);
     }
@@ -452,7 +522,7 @@
       }
     }
 
-    // 4. GOOGLE KALENDER – NESTE DAGER (TITTELEN "NESTE 7 DAGER" ER FJERNET)
+    // 4. GOOGLE KALENDER – NESTE DAGER
     const CALENDAR_API_URL = "https://script.google.com/macros/s/AKfycbw81NLZFBBq2e09NJyxsRHNsyIUfjjo5xD_pn6tkNR-lSJAHV6SUA05_-iF6ztDqe5RlQ/exec";
 
     const colorMap = {
@@ -523,7 +593,7 @@
               <div class="text-[9px] font-bold uppercase tracking-wider text-slate-400 sticky top-0 bg-slate-900/95 py-0.5 capitalize border-b border-slate-700/60">
                 ${group.header}
               </div>
-              <div class="space-y-1.5">
+              <div class="space-y-1">
                 ${eventsHtml}
               </div>
             </div>
@@ -630,7 +700,6 @@
       { id: 'E24',  name: 'E24',        url: 'https://e24.no/rss2/',                 badgeClass: 'bg-emerald-600 text-white' }
     ];
 
-    // Hjelpefunksjon for å rense bort HTML-tags og bilder fra RSS-innledninger
     function cleanIngress(rawText) {
       if (!rawText) return '';
       const div = document.createElement('div');
@@ -640,7 +709,6 @@
     }
 
     async function fetchRssFeed(source) {
-      // 1. Forsøk med rss2json
       try {
         const endpoint = `https://api.rss2json.com/v1/api.json?rss_url=${encodeURIComponent(source.url)}`;
         const res = await fetch(endpoint);
@@ -663,7 +731,6 @@
         console.warn(`Feil ved henting av ${source.name} via primær proxy...`, e);
       }
 
-      // 2. Fallback med allorigins
       try {
         const fallbackUrl = `https://api.allorigins.win/get?url=${encodeURIComponent(source.url)}`;
         const res = await fetch(fallbackUrl);
