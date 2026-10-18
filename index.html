@@ -788,56 +788,55 @@
     }
 
     // 6. TRAFIKK UT FRA OSLO (Fredrikstad, Gardermoen, Sandefjord)
-    async function fetchTrafficConditions() {
-      const now = new Date();
-      const hour = now.getHours();
-      const day = now.getDay();
-      const isRushAfternoon = (day >= 1 && day <= 5) && (hour >= 15 && hour <= 17);
-      const isFridayRush = (day === 5) && (hour >= 13 && hour <= 18);
+    // Sett inn nettapp-URL-en du kopierte fra Google her:
+const TRAFFIC_API_URL = "https://script.google.com/macros/s/AKfycbyISrFQk_Ny09VckRuEqHm2TTAFStOkYA3XbB76WC1VlTudOQFPhggypMov6Mu9Ksuf/exec";
 
-      let delayF = 0;
-      let delayG = 0;
-      let delayS = 0;
+async function fetchTrafficConditions() {
+  try {
+    const res = await fetch(TRAFFIC_API_URL, { redirect: "follow" });
+    if (!res.ok) throw new Error(`HTTP-feil: ${res.status}`);
+    const data = await res.json();
 
-      let statusF = "Normal flyt";
-      let statusG = "Normal flyt";
-      let statusS = "Normal flyt";
+    if (data.status === "ok" && data.routes) {
+      const { fredrikstad, gardermoen, sandefjord } = data.routes;
 
-      if (isFridayRush) {
-        delayF = 18;
-        delayG = 12;
-        delayS = 22;
-        statusF = "Helgerush Ryen/Tusenfryd";
-        statusG = "Tett Alnabru/Djupdalen";
-        statusS = "Kø Lysaker/Sandvika";
-      } else if (isRushAfternoon) {
-        delayF = 12;
-        delayG = 9;
-        delayS = 16;
-        statusF = "Rush Ryen/Mosseveien";
-        statusG = "Tett Sinsen/Alnabru";
-        statusS = "Kø Skøyen/Sandvika";
+      // 1. Fredrikstad
+      if (fredrikstad) {
+        const elTime = document.getElementById('time-fredrikstad');
+        const elStatus = document.getElementById('status-fredrikstad');
+        elTime.textContent = fredrikstad.timeText;
+        elStatus.textContent = fredrikstad.statusText;
+        elTime.className = fredrikstad.delayMinutes >= 8 
+          ? 'text-xs sm:text-sm font-black font-mono text-amber-400' 
+          : 'text-xs sm:text-sm font-black font-mono text-emerald-400';
       }
 
-      const totalF = 70 + delayF;
-      const hF = Math.floor(totalF / 60);
-      const minF = totalF % 60;
-      document.getElementById('time-fredrikstad').textContent = `${hF}t ${minF}m`;
-      document.getElementById('status-fredrikstad').textContent = statusF;
-      document.getElementById('time-fredrikstad').className = delayF > 10 ? 'text-xs sm:text-sm font-black font-mono text-amber-400' : 'text-xs sm:text-sm font-black font-mono text-emerald-400';
+      // 2. Gardermoen
+      if (gardermoen) {
+        const elTime = document.getElementById('time-gardermoen');
+        const elStatus = document.getElementById('status-gardermoen');
+        elTime.textContent = gardermoen.timeText;
+        elStatus.textContent = gardermoen.statusText;
+        elTime.className = gardermoen.delayMinutes >= 5 
+          ? 'text-xs sm:text-sm font-black font-mono text-amber-400' 
+          : 'text-xs sm:text-sm font-black font-mono text-emerald-400';
+      }
 
-      const totalG = 38 + delayG;
-      document.getElementById('time-gardermoen').textContent = `${totalG} min`;
-      document.getElementById('status-gardermoen').textContent = statusG;
-      document.getElementById('time-gardermoen').className = delayG > 7 ? 'text-xs sm:text-sm font-black font-mono text-amber-400' : 'text-xs sm:text-sm font-black font-mono text-emerald-400';
-
-      const totalS = 84 + delayS;
-      const hS = Math.floor(totalS / 60);
-      const minS = totalS % 60;
-      document.getElementById('time-sandefjord').textContent = `${hS}t ${minS}m`;
-      document.getElementById('status-sandefjord').textContent = statusS;
-      document.getElementById('time-sandefjord').className = delayS > 10 ? 'text-xs sm:text-sm font-black font-mono text-amber-400' : 'text-xs sm:text-sm font-black font-mono text-emerald-400';
+      // 3. Sandefjord
+      if (sandefjord) {
+        const elTime = document.getElementById('time-sandefjord');
+        const elStatus = document.getElementById('status-sandefjord');
+        elTime.textContent = sandefjord.timeText;
+        elStatus.textContent = sandefjord.statusText;
+        elTime.className = sandefjord.delayMinutes >= 10 
+          ? 'text-xs sm:text-sm font-black font-mono text-amber-400' 
+          : 'text-xs sm:text-sm font-black font-mono text-emerald-400';
+      }
     }
+  } catch (err) {
+    console.warn("Kunne ikke hente reisetid fra Google Maps:", err);
+  }
+}
 
     // 7. NYHETER: Avisa Oslo (AO), Fredriksstad Blad (F-B), NRK Nasjonalt, E24 med INNLEDNING
     let allNews = [];
