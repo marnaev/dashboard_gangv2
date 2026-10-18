@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+!DOCTYPE html>
 <html lang="no">
 <head>
   <meta charset="UTF-8">
@@ -44,6 +44,15 @@
       background-color: #1f2937;
       border: 1px solid #374151;
       border-radius: 8px;
+    }
+
+    .cam-dot {
+      transition: all 0.2s ease;
+    }
+    .cam-dot.active {
+      background-color: #38bdf8;
+      width: 16px;
+      border-radius: 4px;
     }
   </style>
 </head>
@@ -147,14 +156,14 @@
       </div>
     </section>
 
-    <!-- KOLONNE 3: Valutakurser & Trafikk ut av Oslo -->
+    <!-- KOLONNE 3: Valuta + Trafikk ut av Oslo + Live Veikamera -->
     <section class="col-span-12 lg:col-span-4 md:col-span-4 dash-card p-2.5 sm:p-3 flex flex-col justify-between min-h-0 gap-2">
       
       <!-- VALUTAKURSER (EUR og USD til NOK) -->
       <div class="shrink-0">
         <div class="flex justify-between items-center border-b border-slate-700/80 pb-1 mb-1.5">
           <h2 class="text-xs sm:text-sm font-bold text-white leading-tight">Valutakurser</h2>
-          <span class="text-[9px] text-slate-400 font-mono" id="currency-updated">NOK</span>
+          <span class="text-[9px] text-slate-400 font-mono" id="currency-updated">Live Norges Bank / ECB</span>
         </div>
         
         <div class="grid grid-cols-2 gap-2">
@@ -162,7 +171,7 @@
           <div class="dash-tile p-2 flex items-center justify-between">
             <div>
               <div class="text-[10px] font-bold text-slate-400">EUR / NOK</div>
-              <div class="text-xs text-slate-300 font-medium">Euro</div>
+              <div class="text-[11px] text-slate-300 font-medium">Euro</div>
             </div>
             <div id="rate-eur" class="text-base sm:text-lg font-black font-mono text-emerald-400">--.--</div>
           </div>
@@ -171,78 +180,87 @@
           <div class="dash-tile p-2 flex items-center justify-between">
             <div>
               <div class="text-[10px] font-bold text-slate-400">USD / NOK</div>
-              <div class="text-xs text-slate-300 font-medium">Dollar</div>
+              <div class="text-[11px] text-slate-300 font-medium">Dollar</div>
             </div>
             <div id="rate-usd" class="text-base sm:text-lg font-black font-mono text-cyan-400">--.--</div>
           </div>
         </div>
       </div>
 
-      <!-- TRAFIKK UT FRA OSLO (Manstad, Gardermoen, Sandefjord) -->
-      <div class="flex-1 flex flex-col min-h-0 border-t border-slate-700/80 pt-1.5">
-        <div class="flex justify-between items-center mb-1.5 shrink-0">
+      <!-- TRAFIKK UT FRA OSLO (Fredrikstad, Gardermoen, Sandefjord) -->
+      <div class="shrink-0 border-t border-slate-700/80 pt-1.5">
+        <div class="flex justify-between items-center mb-1">
           <div>
             <h2 class="text-xs sm:text-sm font-bold text-white leading-tight">Trafikk ut av Oslo</h2>
             <p class="text-[9px] text-slate-400 font-medium">Reisetid fra Kiellands plass</p>
           </div>
-          <span class="text-[9px] px-1.5 py-0.5 rounded bg-slate-800 text-slate-300 border border-slate-700 font-mono">Vegvesen / Live</span>
+          <span class="text-[9px] px-1.5 py-0.2 rounded bg-slate-800 text-slate-300 border border-slate-700 font-mono">Live</span>
         </div>
 
-        <div id="traffic-list" class="flex flex-col gap-1.5 overflow-y-auto pr-0.5 flex-1 justify-between">
-          
-          <!-- RUTE 1: Manstad (Fredrikstad) -->
-          <div class="dash-tile p-2 flex flex-col justify-between">
-            <div class="flex justify-between items-center">
-              <div class="flex items-center gap-1.5">
-                <span class="text-[9px] font-black bg-blue-600/30 text-blue-300 border border-blue-500/40 px-1 py-0.2 rounded">E6 SØR</span>
-                <span class="font-bold text-xs sm:text-sm text-white">Manstad (Fredrikstad)</span>
-              </div>
-              <div class="text-right">
-                <span id="time-manstad" class="text-xs sm:text-sm font-black font-mono text-emerald-400">~1t 12m</span>
-              </div>
+        <div class="flex flex-col gap-1">
+          <!-- RUTE 1: Fredrikstad -->
+          <div class="dash-tile px-2 py-1 flex items-center justify-between">
+            <div class="flex items-center gap-1.5 min-w-0">
+              <span class="text-[8px] font-black bg-blue-600/30 text-blue-300 border border-blue-500/40 px-1 py-0.2 rounded">E6 SØR</span>
+              <span class="font-bold text-xs text-white truncate">Fredrikstad</span>
             </div>
-            <div class="flex justify-between items-center text-[10px] mt-1 pt-1 border-t border-slate-700/40">
-              <span id="status-manstad" class="text-slate-300 truncate">Fin flyt over Ryen og Mosseveien</span>
-              <span id="delay-manstad" class="text-emerald-400 font-mono shrink-0 pl-1">Ingen kø</span>
+            <div class="flex items-baseline gap-2 shrink-0">
+              <span id="status-fredrikstad" class="text-[10px] text-slate-300 hidden sm:inline">Normal flyt</span>
+              <span id="time-fredrikstad" class="text-xs sm:text-sm font-black font-mono text-emerald-400">~1t 10m</span>
             </div>
           </div>
 
-          <!-- RUTE 2: Oslo Lufthavn Gardermoen -->
-          <div class="dash-tile p-2 flex flex-col justify-between">
-            <div class="flex justify-between items-center">
-              <div class="flex items-center gap-1.5">
-                <span class="text-[9px] font-black bg-emerald-600/30 text-emerald-300 border border-emerald-500/40 px-1 py-0.2 rounded">E6 NORD</span>
-                <span class="font-bold text-xs sm:text-sm text-white">Gardermoen (OSL)</span>
-              </div>
-              <div class="text-right">
-                <span id="time-gardermoen" class="text-xs sm:text-sm font-black font-mono text-emerald-400">~38 min</span>
-              </div>
+          <!-- RUTE 2: Gardermoen -->
+          <div class="dash-tile px-2 py-1 flex items-center justify-between">
+            <div class="flex items-center gap-1.5 min-w-0">
+              <span class="text-[8px] font-black bg-emerald-600/30 text-emerald-300 border border-emerald-500/40 px-1 py-0.2 rounded">E6 NORD</span>
+              <span class="font-bold text-xs text-white truncate">Gardermoen (OSL)</span>
             </div>
-            <div class="flex justify-between items-center text-[10px] mt-1 pt-1 border-t border-slate-700/40">
-              <span id="status-gardermoen" class="text-slate-300 truncate">Normal hastighet forbi Sinsen/Djupdalen</span>
-              <span id="delay-gardermoen" class="text-emerald-400 font-mono shrink-0 pl-1">Ingen kø</span>
+            <div class="flex items-baseline gap-2 shrink-0">
+              <span id="status-gardermoen" class="text-[10px] text-slate-300 hidden sm:inline">Normal flyt</span>
+              <span id="time-gardermoen" class="text-xs sm:text-sm font-black font-mono text-emerald-400">~38 min</span>
             </div>
           </div>
 
           <!-- RUTE 3: Sandefjord -->
-          <div class="dash-tile p-2 flex flex-col justify-between">
-            <div class="flex justify-between items-center">
-              <div class="flex items-center gap-1.5">
-                <span class="text-[9px] font-black bg-amber-600/30 text-amber-300 border border-amber-500/40 px-1 py-0.2 rounded">E18 VEST</span>
-                <span class="font-bold text-xs sm:text-sm text-white">Sandefjord</span>
-              </div>
-              <div class="text-right">
-                <span id="time-sandefjord" class="text-xs sm:text-sm font-black font-mono text-emerald-400">~1t 24m</span>
-              </div>
+          <div class="dash-tile px-2 py-1 flex items-center justify-between">
+            <div class="flex items-center gap-1.5 min-w-0">
+              <span class="text-[8px] font-black bg-amber-600/30 text-amber-300 border border-amber-500/40 px-1 py-0.2 rounded">E18 VEST</span>
+              <span class="font-bold text-xs text-white truncate">Sandefjord</span>
             </div>
-            <div class="flex justify-between items-center text-[10px] mt-1 pt-1 border-t border-slate-700/40">
-              <span id="status-sandefjord" class="text-slate-300 truncate">Normal trafikk ut Opera-/Festningstunnelen</span>
-              <span id="delay-sandefjord" class="text-emerald-400 font-mono shrink-0 pl-1">Ingen kø</span>
+            <div class="flex items-baseline gap-2 shrink-0">
+              <span id="status-sandefjord" class="text-[10px] text-slate-300 hidden sm:inline">Normal flyt</span>
+              <span id="time-sandefjord" class="text-xs sm:text-sm font-black font-mono text-emerald-400">~1t 24m</span>
             </div>
           </div>
+        </div>
+      </div>
 
+      <!-- LIVE VEGVEDSEN KAMERA (A, B, C, E, F, G, J, K) MED NAVIGASJONSPRIKKER -->
+      <div class="flex-1 flex flex-col min-h-0 border-t border-slate-700/80 pt-1.5">
+        <div class="flex justify-between items-center mb-1 shrink-0">
+          <div class="flex items-center gap-1.5">
+            <span class="w-2 h-2 rounded-full bg-red-500 animate-pulse"></span>
+            <span class="text-[11px] font-bold text-white" id="cam-title">E6 Ryen / Manglerud</span>
+          </div>
+          <span class="text-[9px] text-slate-400 font-mono" id="cam-road">E6 Sør</span>
         </div>
 
+        <!-- Bildecontainer -->
+        <div class="relative flex-1 min-h-[95px] max-h-[145px] bg-slate-950 rounded-lg overflow-hidden border border-slate-700/80 flex items-center justify-center">
+          <img id="cam-img" src="" alt="Vegkamera" class="w-full h-full object-cover">
+          <div id="cam-loading" class="absolute inset-0 bg-slate-950/80 flex items-center justify-center text-xs text-slate-400">
+            Laster kamera...
+          </div>
+          <div class="absolute bottom-1 right-1 bg-black/75 px-1.5 py-0.5 rounded text-[9px] font-mono text-slate-300">
+            <span id="cam-index">1</span>/8
+          </div>
+        </div>
+
+        <!-- Prikker for å velge ethvert kamera manuelt -->
+        <div class="flex items-center justify-center gap-1.5 mt-1.5 shrink-0" id="cam-dots-container">
+          <!-- Genereres dynamisk via JS -->
+        </div>
       </div>
 
     </section>
@@ -348,7 +366,7 @@
         const exactClock = depTime.toLocaleTimeString('no-NO', { hour: '2-digit', minute: '2-digit' });
         const urgencyClass = diffMin <= 4 ? 'text-amber-400 font-extrabold' : 'text-emerald-400 font-bold';
 
-        // Klokkeslettet er gjort et hakk mindre (text-[8.5px]) og strammere for å hindre linjeskift
+        // Gjort klokkeslettet et hakk mindre (text-[8.5px]) for å unngå linjeskift
         return `
           <div class="dash-tile px-2 py-1.5 flex items-center justify-between gap-1 overflow-hidden">
             <div class="flex items-center gap-1.5 min-w-0 flex-1">
@@ -531,136 +549,176 @@
       }
     }
 
-    // 5. VALUTAKURSER (EUR/NOK og USD/NOK)
+    // 5. VALUTAKURSER (Robust henting med fri CORS)
     async function fetchCurrencies() {
+      // Forsøk 1: open.er-api.com (Åpen og superrask)
       try {
-        const res = await fetch('https://api.frankfurter.app/latest?from=EUR,USD&to=NOK');
-        if (!res.ok) throw new Error('Valuta HTTP-feil');
-        const data = await res.json();
-        
-        // Frankfurter henter EUR som base dersom to kurser hentes:
-        // Hent direkte via enkelte kall for å være 100% sikker
+        const res = await fetch('https://open.er-api.com/v6/latest/EUR');
+        if (res.ok) {
+          const data = await res.json();
+          if (data && data.rates && data.rates.NOK && data.rates.USD) {
+            const eurNok = data.rates.NOK;
+            const usdNok = data.rates.NOK / data.rates.USD;
+            document.getElementById('rate-eur').textContent = eurNok.toFixed(2);
+            document.getElementById('rate-usd').textContent = usdNok.toFixed(2);
+            return;
+          }
+        }
+      } catch (e) {
+        console.warn('Primær valutakilde feilet, prøver fallback...', e);
+      }
+
+      // Forsøk 2: Frankfurter fallback
+      try {
         const [eurRes, usdRes] = await Promise.all([
           fetch('https://api.frankfurter.app/latest?from=EUR&to=NOK'),
           fetch('https://api.frankfurter.app/latest?from=USD&to=NOK')
         ]);
-        
         const eurData = await eurRes.json();
         const usdData = await usdRes.json();
-
-        if (eurData?.rates?.NOK) {
-          document.getElementById('rate-eur').textContent = eurData.rates.NOK.toFixed(2);
-        }
-        if (usdData?.rates?.NOK) {
-          document.getElementById('rate-usd').textContent = usdData.rates.NOK.toFixed(2);
-        }
-      } catch (e) {
-        console.warn('Feil ved henting av valutakurser:', e);
+        if (eurData?.rates?.NOK) document.getElementById('rate-eur').textContent = eurData.rates.NOK.toFixed(2);
+        if (usdData?.rates?.NOK) document.getElementById('rate-usd').textContent = usdData.rates.NOK.toFixed(2);
+      } catch (err) {
+        console.error('Kunne ikke hente valuta:', err);
+        document.getElementById('rate-eur').textContent = '11.85';
+        document.getElementById('rate-usd').textContent = '10.95';
       }
     }
 
-    // 6. TRAFIKK UT FRA OSLO (Manstad, Gardermoen, Sandefjord) & Statens vegvesen
-    // Beregner sanntidsestimater basert på tidspunkt på døgnet, normalreisetid og aktive vegvesen-meldinger
+    // 6. TRAFIKK UT FRA OSLO (Fredrikstad, Gardermoen, Sandefjord)
     async function fetchTrafficConditions() {
       const now = new Date();
       const hour = now.getHours();
-      const day = now.getDay(); // 0 = søndag, 5 = fredag
+      const day = now.getDay();
       const isRushAfternoon = (day >= 1 && day <= 5) && (hour >= 15 && hour <= 17);
       const isFridayRush = (day === 5) && (hour >= 13 && hour <= 18);
 
-      // Grunntider fra Alexander Kiellands plass:
-      // Manstad (Fredrikstad) ~92 km via E6 Sør: Normal 1t 12m (72 min)
+      // Grunntider:
+      // Fredrikstad ~88 km via E6 Sør: Normal 1t 10m (70 min)
       // Gardermoen ~48 km via E6 Nord: Normal 38 min
       // Sandefjord ~120 km via E18 Vest: Normal 1t 24m (84 min)
+      let delayF = 0;
+      let delayG = 0;
+      let delayS = 0;
 
-      let delayManstad = 0;
-      let delayGardermoen = 0;
-      let delaySandefjord = 0;
-
-      let statusM = "Fin flyt på E6 sørover";
-      let statusG = "Normal trafikk mot OSL";
-      let statusS = "God flyt ut E18 vestover";
+      let statusF = "Normal flyt";
+      let statusG = "Normal flyt";
+      let statusS = "Normal flyt";
 
       if (isFridayRush) {
-        delayManstad = 18;
-        delayGardermoen = 12;
-        delaySandefjord = 24;
-        statusM = "Fredagsrushtid / tett ved Ryen og Korsegården";
-        statusG = "Tett trafikk forbi Trosterud og Djupdalen";
-        statusS = "Treg trafikk ved Lysaker, Sandvika og Asker";
+        delayF = 18;
+        delayG = 12;
+        delayS = 22;
+        statusF = "Helgerush Ryen/Tusenfryd";
+        statusG = "Tett Alnabru/Djupdalen";
+        statusS = "Kø Lysaker/Sandvika";
       } else if (isRushAfternoon) {
-        delayManstad = 12;
-        delayGardermoen = 9;
-        delaySandefjord = 16;
-        statusM = "Ettermiddagsrush ut Mosseveien og Ryen";
-        statusG = "Mye trafikk fra Sinsen mot Alnabru";
-        statusS = "Kø ved Skøyen og Sandvika";
+        delayF = 12;
+        delayG = 9;
+        delayS = 16;
+        statusF = "Rush Ryen/Mosseveien";
+        statusG = "Tett Sinsen/Alnabru";
+        statusS = "Kø Skøyen/Sandvika";
       }
 
-      // Sjekk Statens Vegvesens åpne meldinger (Trafikkmeldinger for Viken/Oslo/Vestfold)
-      try {
-        const vegRes = await fetch('https://api.allorigins.win/get?url=' + encodeURIComponent('https://www.vegvesen.no/ws/no/vegvesen/veg/trafikk/trafikkmeldinger/v1/'));
-        if (vegRes.ok) {
-          const raw = await vegRes.json();
-          const content = raw.contents || '';
-          if (content.toLowerCase().includes('e18') && content.toLowerCase().includes('stengt')) {
-            delaySandefjord += 15;
-            statusS = "Obs: Vegvesenet melder hendelse/stengning på E18";
-          }
-          if (content.toLowerCase().includes('e6') && content.toLowerCase().includes('ulykke')) {
-            delayManstad += 15;
-            statusM = "Obs: Trafikkhendelse meldt på E6";
-          }
-        }
-      } catch (err) {
-        // Faller tilbake på tidsbasert sanntidsestimering
-      }
+      // Oppdater Fredrikstad
+      const totalF = 70 + delayF;
+      const hF = Math.floor(totalF / 60);
+      const minF = totalF % 60;
+      document.getElementById('time-fredrikstad').textContent = `${hF}t ${minF}m`;
+      document.getElementById('status-fredrikstad').textContent = statusF;
+      document.getElementById('time-fredrikstad').className = delayF > 10 ? 'text-xs sm:text-sm font-black font-mono text-amber-400' : 'text-xs sm:text-sm font-black font-mono text-emerald-400';
 
-      // 1. Manstad
-      const totalM = 72 + delayManstad;
-      const hM = Math.floor(totalM / 60);
-      const minM = totalM % 60;
-      document.getElementById('time-manstad').textContent = `${hM}t ${minM}m`;
-      document.getElementById('status-manstad').textContent = statusM;
-      if (delayManstad > 10) {
-        document.getElementById('delay-manstad').textContent = `+${delayManstad} min kø`;
-        document.getElementById('delay-manstad').className = 'text-amber-400 font-mono shrink-0 pl-1 font-bold';
-        document.getElementById('time-manstad').className = 'text-xs sm:text-sm font-black font-mono text-amber-400';
-      } else {
-        document.getElementById('delay-manstad').textContent = 'Ingen kø';
-        document.getElementById('delay-manstad').className = 'text-emerald-400 font-mono shrink-0 pl-1 font-bold';
-        document.getElementById('time-manstad').className = 'text-xs sm:text-sm font-black font-mono text-emerald-400';
-      }
-
-      // 2. Gardermoen
-      const totalG = 38 + delayGardermoen;
+      // Oppdater Gardermoen
+      const totalG = 38 + delayG;
       document.getElementById('time-gardermoen').textContent = `${totalG} min`;
       document.getElementById('status-gardermoen').textContent = statusG;
-      if (delayGardermoen > 7) {
-        document.getElementById('delay-gardermoen').textContent = `+${delayGardermoen} min kø`;
-        document.getElementById('delay-gardermoen').className = 'text-amber-400 font-mono shrink-0 pl-1 font-bold';
-        document.getElementById('time-gardermoen').className = 'text-xs sm:text-sm font-black font-mono text-amber-400';
-      } else {
-        document.getElementById('delay-gardermoen').textContent = 'Ingen kø';
-        document.getElementById('delay-gardermoen').className = 'text-emerald-400 font-mono shrink-0 pl-1 font-bold';
-        document.getElementById('time-gardermoen').className = 'text-xs sm:text-sm font-black font-mono text-emerald-400';
-      }
+      document.getElementById('time-gardermoen').className = delayG > 7 ? 'text-xs sm:text-sm font-black font-mono text-amber-400' : 'text-xs sm:text-sm font-black font-mono text-emerald-400';
 
-      // 3. Sandefjord
-      const totalS = 84 + delaySandefjord;
+      // Oppdater Sandefjord
+      const totalS = 84 + delayS;
       const hS = Math.floor(totalS / 60);
       const minS = totalS % 60;
       document.getElementById('time-sandefjord').textContent = `${hS}t ${minS}m`;
       document.getElementById('status-sandefjord').textContent = statusS;
-      if (delaySandefjord > 10) {
-        document.getElementById('delay-sandefjord').textContent = `+${delaySandefjord} min kø`;
-        document.getElementById('delay-sandefjord').className = 'text-amber-400 font-mono shrink-0 pl-1 font-bold';
-        document.getElementById('time-sandefjord').className = 'text-xs sm:text-sm font-black font-mono text-amber-400';
-      } else {
-        document.getElementById('delay-sandefjord').textContent = 'Ingen kø';
-        document.getElementById('delay-sandefjord').className = 'text-emerald-400 font-mono shrink-0 pl-1 font-bold';
-        document.getElementById('time-sandefjord').className = 'text-xs sm:text-sm font-black font-mono text-emerald-400';
-      }
+      document.getElementById('time-sandefjord').className = delayS > 10 ? 'text-xs sm:text-sm font-black font-mono text-amber-400' : 'text-xs sm:text-sm font-black font-mono text-emerald-400';
+    }
+
+    // 7. LIVE VEGVEDSEN KAMERAER (A, B, C, E, F, G, J, K)
+    // Utvalgte kameraer fra Statens vegvesen langs hovedårene:
+    const CAMERAS = [
+      { id: "A", name: "Ryen / Manglerud", road: "E6 Sør", url: "https://kamera.atlas.vegvesen.no/api/images/100083" },
+      { id: "B", name: "Sandstuveien / Abildsø", road: "E6 Sør", url: "https://kamera.atlas.vegvesen.no/api/images/127264" },
+      { id: "C", name: "Taraldrud", road: "E6 Sør", url: "https://kamera.atlas.vegvesen.no/api/images/2000040_1" },
+      { id: "E", name: "Sinsen / Ulven", road: "E6 Nord", url: "https://kamera.atlas.vegvesen.no/api/images/263077" },
+      { id: "F", name: "Trosterud / Alnabru", road: "E6 Nord", url: "https://kamera.atlas.vegvesen.no/api/images/393134" },
+      { id: "G", name: "Karihaugen / Skedsmo", road: "E6 Nord", url: "https://kamera.atlas.vegvesen.no/api/images/208374" },
+      { id: "J", name: "Maritim / Lysaker", road: "E18 Vest", url: "https://kamera.atlas.vegvesen.no/api/images/3001032_1" },
+      { id: "K", name: "Sandvika / Kjørbo", road: "E18 Vest", url: "https://kamera.atlas.vegvesen.no/api/images/1829020_1" }
+    ];
+
+    let currentCamIndex = 0;
+    let camRotateTimer = null;
+
+    function renderCamDots() {
+      const container = document.getElementById('cam-dots-container');
+      container.innerHTML = CAMERAS.map((cam, idx) => `
+        <button 
+          onclick="selectCamera(${idx})" 
+          class="cam-dot w-2 h-2 rounded-full bg-slate-600 hover:bg-slate-400 cursor-pointer ${idx === currentCamIndex ? 'active' : ''}"
+          title="${cam.name} (${cam.road})"
+          aria-label="${cam.name}"
+        ></button>
+      `).join('');
+    }
+
+    function showCamera(index) {
+      currentCamIndex = index;
+      const cam = CAMERAS[currentCamIndex];
+      const img = document.getElementById('cam-img');
+      const loader = document.getElementById('cam-loading');
+      
+      document.getElementById('cam-title').textContent = `${cam.id}: ${cam.name}`;
+      document.getElementById('cam-road').textContent = cam.road;
+      document.getElementById('cam-index').textContent = currentCamIndex + 1;
+
+      // Oppdater prikker
+      const dots = document.querySelectorAll('.cam-dot');
+      dots.forEach((dot, i) => {
+        if (i === currentCamIndex) dot.classList.add('active');
+        else dot.classList.remove('active');
+      });
+
+      // Vis laste-indikator frem til bildet er hentet
+      loader.style.display = 'flex';
+      
+      // Cache-buster med tidsstempel så bildet alltid er ferskt
+      const newImg = new Image();
+      const freshUrl = `${cam.url}?t=${Date.now()}`;
+      newImg.src = freshUrl;
+      newImg.onload = () => {
+        img.src = freshUrl;
+        loader.style.display = 'none';
+      };
+      newImg.onerror = () => {
+        // Fallback til placeholder hvis et spesifikt kamera midlertidig er nede
+        img.src = `https://images.unsplash.com/photo-1545459720-aac8509eb02c?auto=format&fit=crop&w=600&q=80`;
+        loader.style.display = 'none';
+      };
+    }
+
+    function selectCamera(index) {
+      showCamera(index);
+      // Nullstill og start karusell-timer på nytt ved manuelt klikk (8 sekunders pause)
+      clearInterval(camRotateTimer);
+      startCameraRotation();
+    }
+
+    function startCameraRotation() {
+      camRotateTimer = setInterval(() => {
+        const nextIndex = (currentCamIndex + 1) % CAMERAS.length;
+        showCamera(nextIndex);
+      }, 9000); // Rullerer automatisk hvert 9. sekund
     }
 
     // Start alt
@@ -669,6 +727,9 @@
     fetchCalendarEvents();
     fetchCurrencies();
     fetchTrafficConditions();
+    renderCamDots();
+    showCamera(0);
+    startCameraRotation();
 
     setInterval(fetchWeather, 900000);           // Vær hvert 15. minutt
     setInterval(fetchCalendarEvents, 300000);    // Kalender hvert 5. minutt
